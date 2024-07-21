@@ -1,0 +1,198 @@
+/* :root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+
+body {
+  background-color: rgb(56, 56, 106);
+  color: rgb(176, 175, 227);
+}
+
+.light{
+  color: rgb(131, 129, 194);
+}
+
+.dark {
+  color: rgb(23, 23, 48);
+}
+
+.bg-elements {
+  background-color: rgb(36, 36, 64);
+}
+
+.bg-element-light {
+  background-color: rgb(48, 48, 75);
+}
+
+.bg-nav {
+  background-color: rgb(36, 36, 64);
+}
+.nav-item-color {
+  color: rgb(95, 95, 167);
+}
+
+.nav-text {
+  color: rgb(202, 208, 237);
+}
+
+.form-width{
+  width: 290px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.btns {
+  background-color: rgb(101, 101, 179);
+  color: rgb(202, 208, 237);
+}
+
+.link{
+  text-decoration: none;
+}
+
+.bg-input-txt {
+  background-color: rgb(42, 42, 78);
+  color: rgb(202, 208, 237);
+}
+
+.bg-input-txt:focus {
+  background-color: rgb(42, 42, 78);
+  color: rgb(202, 208, 237);
+}
+
+.heading {
+  /* background-color: rgb(79, 61, 110); */
+  background-color: rgb(101, 101, 179);
+  color: rgb(202, 208, 237);
+  height: 45px;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+.dim {
+  color: rgb(127, 145, 235);
+}
+
+.message-box {
+  background-color: rgb(56, 56, 106);
+  color: rgb(202, 208, 237);
+  overflow-y: scroll;
+  height: 400px;
+}
+
+.full-height {
+  height: 100vh;
+}
+
+.overflow {
+  overflow-y: scroll;
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+
+.bg-heading{
+  background-color: rgb(79, 61, 110);
+}
+
+.chat-box {
+  background-color: rgb(79, 61, 110);
+  color: white;
+}
+
+.chat-box:focus {
+  background-color: rgb(79, 61, 110);
+  color: white;
+}
+
+.f-sm{
+  font-size: smaller;
+}
+
+.heading-height {
+  height: 40px;
+}
+.description-input {
+  height: 250px;
+}
+.txtarea {
+  resize: none;
+}
+.room-form-input {
+  height: 45px;
+}
+
+.back_arrow {
+  height: 5px;
+  width: 30px;
+}
