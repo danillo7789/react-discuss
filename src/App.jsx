@@ -38,7 +38,7 @@ function App() {
             <RoomFeed />
           </div>
   
-          <div className="col-lg-3 sticky-col">
+          <div className="col-lg-3 overflow">
             <ActivityFeed />
           </div>
         </div>

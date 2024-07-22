@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext/context";
-import moment from "moment";
+import RoomCard from "./RoomCard";
 
-const RoomFeed = () => {
+const RoomFeed = ({ filterFunction }) => {
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
@@ -32,10 +32,10 @@ const RoomFeed = () => {
 
       if (!response.ok) {
         setIsLoading(false);
-        setError(data.message || 'Failed to fetch rooms');
+        setError(data?.message || 'Failed to fetch rooms');
         return;
       }
-      console.log('room-feed', data)
+      
       setIsLoading(false);
       setRooms(data);
     } catch (error) {
@@ -54,11 +54,9 @@ const RoomFeed = () => {
     if (isLoggedIn) {
         getRooms();
     }
-  }, []);
+  }, [isLoggedIn]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const filteredRooms = filterFunction ? rooms?.filter(filterFunction) : rooms;
 
   return (
     <div>
@@ -70,32 +68,18 @@ const RoomFeed = () => {
       <div className="d-flex justify-content-between">
         <div>
             <h5>Diskors</h5>
-            <h6 className="dark">{rooms.length} rooms available</h6>
+            <h6 className="dark">{filteredRooms?.length} rooms available</h6>
         </div>
         <div>
             <Link to='/create-room'><button className="btn btns">Create Room</button></Link>
         </div>
       </div>
 
-      {rooms ? (
-        rooms.map((room) => (
-          <div className="my-3 px-4 pt-4 pb-3 bg-elements border border-0 rounded-3" key={room._id}>
-            <div className="d-flex justify-content-between mb-1">
-                <div className="d-flex">
-                    <img className="rounded-circle me-2" src="sss" alt="pic" />
-                    <small className="dim">@{room.host.username}</small>
-                </div>
-                <div>{moment(room.createdAt).fromNow()}</div>
-            </div>
 
-            <Link className="text-light link mb-1" to={`/room/${room._id}`}><h5>{room.name}</h5></Link>
-            <hr className="divider bg-element-light" />
-            <div className="d-flex justify-content-between">
-                <small>{room.participants.length} Joined</small>
-                <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize">{room.topic.name}</small>
-            </div>
-          </div>
-        ))
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : filteredRooms.length > 0 ? (
+        filteredRooms.map((room) => <RoomCard key={room?._id} room={room} />)
       ) : (
         <p>No rooms available</p>
       )}

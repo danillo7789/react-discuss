@@ -1,62 +1,84 @@
 import React, { useEffect, useState } from 'react'
+import { baseUrl } from '../config/BaseUrl';
+import moment from 'moment';
+import { Link } from 'react-router-dom';
 
-const ActivityFeed = () => {
-    const [error, setError] = useState('');
-    const [activities, setActivities] = useState([]);
-    const [room, setRoom] = useState([]);
+const ActivityFeed = ({ filterFunc }) => {
+  const [error, setError] = useState('');
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const token = localStorage.getItem('token');
+  const blank_img = import.meta.env.VITE_BLANK_IMG;
 
-    const getActivities = async () => {
-        const token = localStorage.getItem('token');
-        
-        if (!token) {
-          setError('No token found');
-          return;
-        }
+  const getAllChats = async () => {
+    setIsLoading(true)
     
-        try {
-          const response = await fetch('http://localhost:5000/api/get/activity-feed', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-          });
+    if (!token) {
+      setError('No token found');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${baseUrl}/api/get/chats`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Failed to fetch chats');
+        return;
+      }
+
+      setActivities(data);
+      setIsLoading(false)
+    } catch (error) {
+      setError('An error occurred while fetching chats');
+      console.error('Error fetching chats:', error);
+      setIsLoading(false);
+    }
+  };
     
-          const data = await response.json();
-    
-          if (!response.ok) {
-            setError(data.message || 'Failed to fetch topics');
-            return;
-          }
-    
-          console.log('data', data);
-          setActivities(data);
-          setRoom('')
-        } catch (error) {
-          setError('An error occurred while fetching topics');
-          console.error('Error fetching topics:', error);
-        }
-      };
-    
-      useEffect(() => {
-        getActivities();
-      }, []);
+  useEffect(() => {
+    getAllChats();
+  }, []);
+
+  const filteredActivities = filterFunc ? activities.filter(filterFunc) : activities;
 
   return (
     <div className=''>
       <div className='bg-elements border border-0 rounded-3'>
           <div className='heading d-flex justify-content-between px-4 pt-2'>
-            PARTICIPANTS <small>({room?.participants?.length} Joined)</small>
+            RECENT ACTIVITIES
           </div>
 
-          <div className='px-4 py-3'>
-            {room?.participants?.map(user => (
-              <div key={user?._id} className="d-flex">
-                <img className="rounded-circle me-2 mb-2" src="sss" alt="pic" />
-                <small className='dim'>@{user?.username}</small>
+          {isLoading ? (<div>Loading...</div>) : 
+          (<div className='px-4 py-3 '>
+            {filteredActivities?.map(activity => (
+              <div key={activity?._id} className="border border-secondary mb-2">
+                <div className='d-flex p-1'>
+                  <img className="rounded-circle me-2 display-pic" src={activity?.sender?.profilePicture?.url || blank_img} alt="display picture" />
+                  <div>
+                    <small className='dim me-2 f-sm'>@{activity?.sender?.username}</small>
+                    <small className='fw-lighter f-xsm'>{moment(activity?.createdAt).fromNow()}</small>
+                    <div>
+                      <small className='f-sm'>posted to room</small> 
+                      "<div>
+                        <Link to={`/room/${activity?.room?._id}`} className='linkc dim'>{activity?.room?.name}</Link>
+                      </div>"
+                    </div>
+                  </div>          
+                </div>
+                
+                <div className='mx-2 f-sm border border-0 activity-chat mb-2 p-2 rounded'>{activity?.text}</div>
+
               </div>
             ))}
-          </div>
+          </div>)}
         </div>
     </div>
   )

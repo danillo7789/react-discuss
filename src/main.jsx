@@ -12,6 +12,8 @@ import UnLogged from './components/UnLogged.jsx';
 import Room from './components/Room.jsx';
 import CreateRoom from './components/CreateRoom.jsx';
 import UpdateRoom from './components/UpdateRoom.jsx';
+import Profile from './components/Profile.jsx';
+import EditProfile from './components/EditProfile.jsx';
 
 const router = createBrowserRouter([
   {
@@ -53,7 +55,17 @@ const router = createBrowserRouter([
     path: "update-room/:id",
     element: <UpdateRoom />,
     errorElement: <ErrorPage />
-  }
+  },
+  {
+    path: "profile/:id",
+    element: <Profile />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "update-profile/:id",
+    element: <EditProfile />,
+    errorElement: <ErrorPage />
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

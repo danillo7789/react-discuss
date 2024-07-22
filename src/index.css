@@ -68,8 +68,10 @@ button:focus-visible {
 } */
 
 body {
-  background-color: rgb(56, 56, 106);
+  background-color: rgb(48, 48, 91);
   color: rgb(176, 175, 227);
+  margin: 0;
+  padding: 0;
 }
 
 .light{
@@ -77,7 +79,7 @@ body {
 }
 
 .dark {
-  color: rgb(23, 23, 48);
+  color: rgb(14, 14, 29);
 }
 
 .bg-elements {
@@ -99,6 +101,13 @@ body {
   color: rgb(202, 208, 237);
 }
 
+.room-name {
+  color: rgb(218, 222, 243);
+}
+.room-name:hover {
+  color: rgb(97, 107, 155);
+}
+
 .form-width{
   width: 290px;
 }
@@ -108,11 +117,16 @@ body {
 }
 
 .btns {
-  background-color: rgb(101, 101, 179);
+  background-color: rgb(112, 86, 155);
   color: rgb(202, 208, 237);
 }
 
-.link{
+.btns:hover {
+  background-color: rgb(89, 67, 126);
+  color: rgb(202, 208, 237);
+}
+
+.linkc{
   text-decoration: none;
 }
 
@@ -143,7 +157,7 @@ body {
   background-color: rgb(56, 56, 106);
   color: rgb(202, 208, 237);
   overflow-y: scroll;
-  height: 400px;
+  height: 360px;
 }
 
 .full-height {
@@ -151,13 +165,32 @@ body {
 }
 
 .overflow {
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 100%;
 }
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
+} */
+
+/* Webkit Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 5px; /* Set the desired width */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(36, 36, 64); /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded edges of the scrollbar thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color when hovering over the scrollbar thumb */
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(101, 101, 179); /* Color of the scrollbar track */
+  border-radius: 10px; /* Rounded edges of the scrollbar track */
 }
 
 
@@ -179,6 +212,10 @@ body {
   font-size: smaller;
 }
 
+.f-xsm{
+  font-size: x-small;
+}
+
 .heading-height {
   height: 40px;
 }
@@ -195,4 +232,25 @@ body {
 .back_arrow {
   height: 5px;
   width: 30px;
+}
+
+.navbar-dp {
+  height: 40px;
+  width: 40px;
+}
+
+.display-pic {
+  height: 50px;
+  width: 50px;
+}
+
+.profile-pic {
+  height: 80%;
+  width: 80%;
+  margin-left: 10%;
+}
+
+.activity-chat {
+  background-color: rgb(83, 83, 146);
+  color: white;
 }

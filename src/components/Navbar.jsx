@@ -2,9 +2,16 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import Logout from './Logout';
+import useUser from '../hooks/useUser';
 
 const Navbar = () => {
-    const { currentUser, isLoggedIn, logout } = useAuth();
+    const { isLoggedIn } = useAuth();
+    const blank_img = import.meta.env.VITE_BLANK_IMG;
+    // const [isLoading, setIsLoading] = useState(false);
+    const { user, error } = useUser();
+
+
+
     return (
         <div className='sticky-top'>
             <nav className="navbar navbar-expand-lg bg-nav py-3">
@@ -18,24 +25,24 @@ const Navbar = () => {
   
                         </ul>
                         <form className="d-flex" role="search">
-                            <input className="form-control me-2 bg-element-light border border-0" type="search" placeholder="Search" aria-label="Search" />
+                            <input className="form-control me-2 bg-input-txt border border-0" type="search" placeholder="Search" aria-label="Search" />
                             <button className="btn btns" type="submit">Search</button>
                         </form>
                         
                         {isLoggedIn? (<ul className="navbar-nav nav-text mb-2 mb-lg-0">
-                            <img className='ms-3' src="" alt="profile-picture" />
+                            <img className='ms-3 rounded-circle navbar-dp display-pic' src={user?.profilePicture?.url || blank_img} alt="profile-picture" />
                             <li className="nav-item dropdown nav-text">
-                                <a className="nav-link dropdown nav-text-toggle nav-text" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @{currentUser.username}
+                                <a className="nav-link dropdown nav-text-toggle nav-text dim" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @{user?.username}
                                 </a>
-                                <ul className="dropdown-menu">
-                                    <li><a className="dropdown-item" href="#">Profile</a></li>
+                                <ul className="dropdown-menu btns">
+                                    <li><Link className="dropdown-item" to={`/profile/${user?._id}`}>Profile</Link></li>
                                     <li><hr className="dropdown-divider" /></li>
                                     <Logout />                                    
                                 </ul>
                             </li>
                         </ul>) : (<div className='d-flex'>
-                            <img className='me-2 ms-3' src="wait" alt="pic" />
+                            <img className='me-2 ms-3 rounded-circle display-pic' src={blank_img} alt="display picture" />
                             <Link className='nav-link nav-text' to='/login'>Login</Link>
                         </div>)}
                     </div>

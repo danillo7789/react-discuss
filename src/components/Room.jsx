@@ -5,6 +5,7 @@ import { useAuth } from '../authContext/context';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
 import moment from 'moment';
+import Chat from './Chat';
 
 const Room = () => {
   const [room, setRoom] = useState({});
@@ -16,6 +17,7 @@ const Room = () => {
   const [chatPosted, setChatPosted] = useState(false);
   const [chatDeleted, setChatDeleted] = useState(false);
   const navigate = useNavigate();
+  const blank_img = import.meta.env.VITE_BLANK_IMG;
 
   const token = localStorage.getItem('token');
 
@@ -65,7 +67,7 @@ const Room = () => {
     const tempId = Date.now(); // Generate a temporary ID for the new chat
     const newChat = {
       _id: tempId,
-      sender: { username: currentUser.username }, // Replace 'current_user' with actual current user's username
+      sender: { username: currentUser?.username }, 
       text: message,
       createdAt: new Date().toISOString(),
     };
@@ -75,6 +77,7 @@ const Room = () => {
       ...prevRoom,
       chats: [...prevRoom.chats, newChat],
     }));
+    setMessage('');
 
     try {
       const response = await fetch(`${baseUrl}/api/post-chat/${id}`, {
@@ -90,6 +93,7 @@ const Room = () => {
 
       if (!response.ok) {
         setError(data.message || 'Error sending message');
+        setIsLoading(false);
         return;
       }
 
@@ -102,16 +106,18 @@ const Room = () => {
     }));
 
       setMessage(''); 
-      setChatPosted(true); 
+      setChatPosted(true);
+      setIsLoading(false);
     } catch (error) {
       setError('An error occurred while sending message');
       console.error('Error sending message', error);
 
-    // Revert the optimistic update
-    setRoom(prevRoom => ({
-        ...prevRoom,
-        chats: prevRoom.chats.filter(chat => chat._id !== tempId),
-    }));
+        // Revert the optimistic update
+        setRoom(prevRoom => ({
+            ...prevRoom,
+            chats: prevRoom.chats.filter(chat => chat._id !== tempId),
+        }));
+        setIsLoading(false);
     }
   };
 
@@ -153,7 +159,7 @@ const Room = () => {
       setError('No token found');
       return;
     }
-
+    setChatDeleted(true)
     try {
       const response = await fetch(`${baseUrl}/api/delete-chat/${chatId}`, {
         method: 'DELETE',
@@ -170,7 +176,6 @@ const Room = () => {
         return;
       }
 
-      setChatDeleted(true)
       getChats();
     } catch (error) {
       setError('An error occurred while deleting chat');
@@ -227,9 +232,6 @@ const Room = () => {
     }
   }, [chatPosted, isLoggedIn, chatDeleted]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>
@@ -242,51 +244,51 @@ const Room = () => {
               <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
                 {error}
                 <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>}
-            <div className='bg-elements border border-0 rounded-3'>
-              <div className='heading btns d-flex justify-content-between px-4 pt-2'>
-                <BackLink />
-                {room && room?.host?._id === currentUser?.id && (
-                    <div className='d-flex'>
-                        <Link className='link' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
-                        <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
-                    </div>
-                )}
               </div>
+            }
 
-              <div className="d-flex justify-content-between px-4 py-3">
-                <h4 className='fw-bold'>{room?.name}</h4>
-                <div>{moment(room?.createdAt).fromNow()}</div>
-              </div>
-              <div className='px-4 pb-3'>
-                <div>HOSTED BY <span className='dim mb-1'>@{room?.host?.username}</span></div>
-                <div className="d-flex mb-2">
-                  <img className="rounded-circle me-2" src="sss" alt="pic" />
-                  <small className='dim'>@{room?.host?.username}</small>
+            <div className='bg-elements border border-0 rounded-3'>  
+                <div className='heading px-4 pt-2'>
+                    {isLoading ? (<div>Loading...</div>) : (
+                    <div className='d-flex justify-content-between'>
+                        <BackLink />
+                        {room && room?.host?._id === currentUser?.id && (
+                            <div className='d-flex'>
+                                <Link className='linkc' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
+                                <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
+                            </div>
+                        )}                                 
+                    </div>)}
                 </div>
-                <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize">{room?.topic?.name}</small>
-              </div>
+                
+                {isLoading ? <div>Loading...</div> : (
+                <div>
+                    <div className="d-flex justify-content-between px-4 py-3">
+                        <h4 className='fw-bold'>{room?.name}</h4>
+                        <div>{moment(room?.createdAt).fromNow()}</div>
+                    </div>
+                    <div className='px-4 pb-3'>
+                        <div className='mb-1'>HOSTED BY <span className='dim mb-1'>@{room?.host?.username}</span></div>
+                        <div className="d-flex mb-2">
+                        <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
+                        {/* <small className='dim'>@{room?.host?.username}</small> */}
+                        </div>
+                        <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text">{room?.topic?.name}</small>
+                    </div>
+                </div>)}
 
               <div className='px-4 pb-3'>
-                <div className='message-box p-4 rounded'>
+
+                <div className='message-box p-3 rounded'>
                   {room?.chats?.map(chat => (
-                    <div key={chat?._id} className='chat border-start border-primary px-3 mb-2 bg-element-light rounded py-3'>
-                        <div className='d-flex justify-content-between'>
-                            <div className="d-flex f-sm pb-2">
-                                <img className="rounded-circle me-2" src="sss" alt="pic" />
-                                <small className='dim me-2'>@{chat?.sender?.username}</small>
-                                <span>{moment(chat?.createdAt).fromNow()}</span>
-                            </div>
-                            <div>
-                            {currentUser?.id === chat?.sender?._id && (
-                                <div className='text-danger f-sm pointer' onClick={() => deleteChat(chat?._id)}>Delete</div>
-                            )}
-                            </div>
-                        </div>
-                      <div className='text-light px-1'>{chat?.text}</div>
-                    </div>
+                    <Chat
+                      key={chat?._id}
+                      chat={chat} 
+                      deleteChat={deleteChat}
+                      isLoading={isLoading} />
                   ))}
                 </div>
+
                 <div className='rounded bg-heading'>
                   <form onSubmit={postChat}>
                     <div className='d-flex'>
@@ -294,16 +296,16 @@ const Room = () => {
                         type="text"
                         placeholder='Write your message here'
                         value={message}
-                        className='form-control mb-3 chat-box py-2 border border-0 room-form-input bg-input-txt'
+                        className='form-control chat-box py-2 border border-0 room-form-input bg-input-txt'
                         onChange={(e) => setMessage(e.target.value)}
                         required
                       />
-                      <button type="submit" className="btn btn-primary ">Send</button>
+                      <button type="submit" className="btn btns">Send</button>
                     </div>
                   </form>
                 </div>
+                
               </div>
-
             </div>
           </div>
 
@@ -315,9 +317,9 @@ const Room = () => {
 
               <div className='px-4 py-3'>
                 {room?.participants?.map(user => (
-                  <div key={user?._id} className="d-flex">
-                    <img className="rounded-circle me-2 mb-2" src="sss" alt="pic" />
-                    <small className='dim'>@{user?.username}</small>
+                  <div key={user?._id} className="d-flex mb-2">
+                    <img className="rounded-circle me-2 display-pic" src={user?.profilePicture?.url || blank_img} alt="display picture" />
+                    <small className='dim mt-2'>@{user?.username}</small>
                   </div>
                 ))}
               </div>

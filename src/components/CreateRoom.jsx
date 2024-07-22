@@ -34,7 +34,7 @@ const CreateRoom = () => {
         setError(data.message || 'Failed to fetch topics');
         return;
       }
-      console.log(data.topicsObject)
+      
       setTopics(data.topicsObject);
     } catch (error) {
       setError('An error occurred while fetching topics');
@@ -94,51 +94,51 @@ const CreateRoom = () => {
                     <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>}
                 <div className='bg-elements border border-0 rounded-3'>
-                <div className='heading d-flex justify-content-between px-4 py-2'>
-                    <div className='d-flex'><BackLink /> <p className='ms-5'>CREATE ROOM</p></div>
-                    <div></div>
-                </div>
-                <form className='px-4 pt-3 pb-4' onSubmit={postRoom}>
-                    <div>
-                    <label className='pb-2'>Topic</label>
-                    <input
-                        type="text"
-                        className='form-control mb-4 bg-input-txt border border-0 room-form-input'
-                        placeholder='Enter or select a topic'
-                        value={topic}
-                        onChange={(e) => setTopic(e.target.value)}
-                        list='topic-list'
-                        required
-                    />
-                    <datalist id='topic-list'>
-                        {topics.map(eachTopic => (
-                            <option key={eachTopic.topic} value={eachTopic.topic} />
-                        ))}
-                    </datalist>
+                    <div className='heading d-flex justify-content-between px-4 py-2'>
+                        <div className='d-flex'><BackLink /> <p className='ms-5'>CREATE ROOM</p></div>
+                        <div></div>
                     </div>
-                    <div>
-                    <label className='pb-2'>Name</label>
-                    <input
-                        type="text"
-                        className='form-control mb-4 bg-input-txt border border-0 room-form-input'
-                        placeholder='Room Name'
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                    </div>
-                    <div>
-                    <label className='pb-2'>Description</label>
-                    <textarea
-                        type="text"
-                        className='form-control mb-5 bg-input-txt border border-0 description-input txtarea'
-                        placeholder='Description'
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                    </div>
-                    <button className='btn btns' type="submit">Create Room</button>
-                </form>
+                    <form className='px-4 pt-3 pb-4' onSubmit={postRoom}>
+                        <div>
+                        <label className='pb-2'>Topic</label>
+                        <input
+                            type="text"
+                            className='form-control mb-4 bg-input-txt border border-0 room-form-input'
+                            placeholder='Enter or select a topic'
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                            list='topic-list'
+                            required
+                        />
+                        <datalist id='topic-list'>
+                            {topics.map(eachTopic => (
+                                <option key={eachTopic.topic} value={eachTopic.topic} />
+                            ))}
+                        </datalist>
+                        </div>
+                        <div>
+                        <label className='pb-2'>Name</label>
+                        <input
+                            type="text"
+                            className='form-control mb-4 bg-input-txt border border-0 room-form-input'
+                            placeholder='Room Name'
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                        </div>
+                        <div>
+                        <label className='pb-2'>Description</label>
+                        <textarea
+                            type="text"
+                            className='form-control mb-5 bg-input-txt border border-0 description-input txtarea'
+                            placeholder='Description'
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                        </div>
+                        <button className='btn btns' type="submit">Create Room</button>
+                    </form>
                 </div>
             </div>
           <div className="col-lg-3"></div>

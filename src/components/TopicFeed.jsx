@@ -56,7 +56,6 @@ const TopicFeed = () => {
     return <div>Loading...</div>;
   }
 
-  console.log('topics', topics)
   return (
     <div className="px-2">
       {error && 
@@ -64,7 +63,7 @@ const TopicFeed = () => {
             {error}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>}
-      <h4 className="">Browse Topics</h4>
+      <h5 className="">Browse Topics</h5>
       <div className="d-flex justify-content-between">
         <p className="dark fw-bold">All</p> <p className="border border-0 px-2 py-1 bg-nav">{topicCount}</p>
       </div>
