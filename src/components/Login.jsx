@@ -15,8 +15,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    // setAccess('');
-    // setPassword('');
 
     try {
         const response = await fetch(`${baseUrl}/api/user/login`, {
@@ -34,9 +32,10 @@ const Login = () => {
             
             setAccess('');
             setPassword('');
-            navigate('/home');
+            navigate('/');
         } else {
             setError(data.message);
+            console.error('Error loggin user in');
         }
     } catch (error) {
         setError('Error logging in. Please try again.');
@@ -44,9 +43,9 @@ const Login = () => {
     }
   }
 
-  if (isLoggedIn) {
-    navigate('/home');
-  }
+//   if (isLoggedIn) {
+//     navigate('/');
+//   }
 
 
   return (
@@ -56,7 +55,12 @@ const Login = () => {
             <div className='row pt-3'>
                 <div className="col">
                     <h2 className='mb-4'>Login</h2>
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {error && 
+                    <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
+                        {error}
+                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    }
                     <form className='form-width' onSubmit={handleSubmit}>
                         <div>
                             <label className='pb-2'>Email</label>

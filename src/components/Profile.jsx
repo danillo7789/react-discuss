@@ -4,7 +4,8 @@ import { baseUrl } from '../config/BaseUrl';
 import Navbar from './Navbar';
 import RoomFeed from './RoomFeed';
 import ActivityFeed from './ActivityFeed';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import '../App.css'
 
 const Profile = () => {
   const token = localStorage.getItem('token');
@@ -12,10 +13,12 @@ const Profile = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser, isLoggedIn } = useAuth();
-  const id = currentUser?.id;
+  const { id } = useParams()
   const blank_img = import.meta.env.VITE_BLANK_IMG;
 
-  const getUser = async () => {
+
+
+  const getUser = async (id) => {
     setIsLoading(true);
 
     if (!token) {
@@ -35,6 +38,10 @@ const Profile = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+            logout();
+            navigate('/login')
+        }
         setError(data.message || 'Error fetching user');
         setIsLoading(false);
         return;
@@ -51,20 +58,21 @@ const Profile = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      getUser();
+      getUser(id);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, id]);
 
 
-  const filterRoomsByHost = (room) => room?.host?._id === currentUser?.id;
-  const filterActivitiesByHost = (activity) => activity?.room?.host?._id === currentUser?.id;
+  const filterRoomsByHost = (room) => room?.host?._id === id;
+  
+  const filterActivitiesByHost = (activity) => activity?.room?.host?._id === id;
 
   return (
     <div>
       <Navbar />
 
       <div className="container full-height">
-        <div className="row pt-3 full-height">
+        <div id='temp-col-contain' className="row pt-3 full-height">
             {error && 
             <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
                 {error}
@@ -72,7 +80,7 @@ const Profile = () => {
             </div>}
 
             {isLoading ? <div>Loading...</div> : 
-            (<div className="col-lg-3 sticky-col">
+            (<div id='topicfeedp' className="col-lg-3 sticky-col">
                 {error && (
                 <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
                     {error}
@@ -87,17 +95,18 @@ const Profile = () => {
                             <div><h6>Email: </h6> <div className='text-light'>{user?.email}</div></div>
                         </div>
                         <div>
-                            <Link to={`/update-profile/${user?._id}`} className='linkc btn btns'>Edit Profile</Link>
+                            {currentUser?.id === id &&
+                            <Link to={`/update-profile/${user?._id}`} className='linkc btn btns'>Edit Profile</Link>}
                         </div>
                     </div>
                 </div>
             </div>)}
 
-          <div className="col-lg-6 overflow">
+          <div id='roomfeedp' className="col-lg-6 overflow">
             <RoomFeed filterFunction={filterRoomsByHost} />
           </div>
 
-          <div className="col-lg-3 overflow">
+          <div id='activityfeedp' className="col-lg-3 overflow">
             <ActivityFeed filterFunc={filterActivitiesByHost} />
           </div>
         </div>

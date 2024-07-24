@@ -17,14 +17,14 @@ import EditProfile from './components/EditProfile.jsx';
 
 const router = createBrowserRouter([
   {
-    path: "home",
+    path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
   },
   {
-    path: "/",
+    path: "feed",
     element: <UnLogged />,
-    errorElement: <ErrorPage />
+    errorElement: <ErrorPage />,
   },
   {
     path: "login",

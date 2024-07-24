@@ -92,6 +92,11 @@ const EditProfile = () => {
                 <div className='d-flex'><BackLink /> <p className='ms-5'>EDIT PROFILE</p></div>
                 <div></div>
               </div>
+              {preview && (
+                    <div className='my-3 ms-5'>
+                      <img src={preview} alt="Profile Preview" width="170" height="170" />
+                    </div>
+                )}
               <div>
                 <form className='px-4 pt-3 pb-4' onSubmit={handleSubmit} encType="multipart/form-data">
                   <div>
@@ -112,11 +117,6 @@ const EditProfile = () => {
                       className='form-control mb-4 bg-input-txt border border-0 room-form-input'
                     />
                   </div>
-                  {preview && (
-                    <div className='mb-3'>
-                      <img src={preview} alt="Profile Preview" width="150" height="150" />
-                    </div>
-                  )}
                   <button className='btn btns' type="submit" disabled={isLoading}>
                     {isLoading ? 'Submitting...' : 'Submit'}
                   </button>

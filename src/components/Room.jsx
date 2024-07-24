@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { baseUrl } from '../config/BaseUrl';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
@@ -18,6 +18,8 @@ const Room = () => {
   const [chatDeleted, setChatDeleted] = useState(false);
   const navigate = useNavigate();
   const blank_img = import.meta.env.VITE_BLANK_IMG;
+
+  // console.log('room rendered');
 
   const token = localStorage.getItem('token');
 
@@ -211,7 +213,7 @@ const Room = () => {
       }
   
       setIsLoading(false);
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       setIsLoading(false);
       setError('An error occurred while deleting the room');
@@ -268,7 +270,11 @@ const Room = () => {
                         <div>{moment(room?.createdAt).fromNow()}</div>
                     </div>
                     <div className='px-4 pb-3'>
-                        <div className='mb-1'>HOSTED BY <span className='dim mb-1'>@{room?.host?.username}</span></div>
+                        <div className='mb-1'>HOSTED BY 
+                          <Link className='linkc' to={`/profile/${room?.host?._id}`}>
+                            <span className='dim mb-1'> @{room?.host?.username}</span>
+                          </Link>
+                        </div>
                         <div className="d-flex mb-2">
                         <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
                         {/* <small className='dim'>@{room?.host?.username}</small> */}
@@ -319,7 +325,7 @@ const Room = () => {
                 {room?.participants?.map(user => (
                   <div key={user?._id} className="d-flex mb-2">
                     <img className="rounded-circle me-2 display-pic" src={user?.profilePicture?.url || blank_img} alt="display picture" />
-                    <small className='dim mt-2'>@{user?.username}</small>
+                    <Link className='linkc' to={`/profile/${user?._id}`}><small className='dim mt-2'>@{user?.username}</small></Link>
                   </div>
                 ))}
               </div>
@@ -331,4 +337,4 @@ const Room = () => {
   );
 };
 
-export default Room;
+export default memo(Room);

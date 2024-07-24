@@ -40,7 +40,7 @@ const Register = () => {
   };
 
   if (isLoggedIn) {
-    navigate('/home');
+    navigate('/');
   }
 
   return (

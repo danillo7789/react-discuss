@@ -74,6 +74,14 @@ body {
   padding: 0;
 }
 
+.brand-name {
+  color: rgb(202, 208, 237);
+}
+
+.brand-name:hover {
+  color: rgb(170, 179, 226);
+}
+
 .light{
   color: rgb(131, 129, 194);
 }
@@ -151,6 +159,10 @@ body {
 
 .dim {
   color: rgb(127, 145, 235);
+}
+
+.dim:hover {
+  color: rgb(160, 172, 235);
 }
 
 .message-box {
@@ -245,8 +257,8 @@ body {
 }
 
 .profile-pic {
-  height: 80%;
-  width: 80%;
+  height: 230px;
+  width: 230px;
   margin-left: 10%;
 }
 

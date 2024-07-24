@@ -13,8 +13,8 @@ const UpdateRoom = () => {
   const [room, setRoom] = useState({});
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true); // Initialize as true
-  const [updating, setUpdating] = useState(false); // Initialize as true
+  const [firstLoad, setFirstLoad] = useState(true); 
+  const [updating, setUpdating] = useState(false); 
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -76,7 +76,7 @@ const UpdateRoom = () => {
       setRoom(data);
       setName(data.name);
       setTopic(data.topic?.name || '');
-      setDescription(data.description);
+      setDescription(data.description || '');
       setIsLoading(false);
     } catch (error) {
       setError('An error occurred while fetching room');
@@ -98,8 +98,9 @@ const UpdateRoom = () => {
   }, [room]);
 
   const editRoom = async (e) => {
-    setUpdating(true)
     e.preventDefault();
+    setUpdating(true)
+    setError('');
 
     if (!token) {
       setError('No token found');

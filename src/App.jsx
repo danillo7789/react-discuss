@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 import './App.css'
 import { useAuth } from './authContext/context';
 import Navbar from './components/Navbar'
@@ -15,7 +15,7 @@ function App() {
     if (!isLoading) {
       if (!isLoggedIn) {
         logout();
-        navigate('/');
+        navigate('/feed');
       }
     }
   }, [isLoading, isLoggedIn, logout, navigate])
@@ -29,16 +29,16 @@ function App() {
       <Navbar />
   
       <div className='container full-height'>
-        <div className="row pt-3 full-height">
-          <div className="col-lg-3 sticky-col">
+        <div id='temp-col-contain' className="row pt-3 full-height">
+          <div id='topicfeed' className="col-lg-3 sticky-col">
             <TopicFeed />
           </div>
           
-          <div className="col-lg-6 overflow">
+          <div id='roomfeed' className="col-lg-6 overflow">
             <RoomFeed />
           </div>
   
-          <div className="col-lg-3 overflow">
+          <div id='activityfeed' className="col-lg-3 overflow">
             <ActivityFeed />
           </div>
         </div>
@@ -49,4 +49,4 @@ function App() {
   
 }
 
-export default App
+export default memo(App)

@@ -7,15 +7,19 @@ const RoomFeed = ({ filterFunction }) => {
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
-  const { logout, isLoggedIn } = useAuth();
+  const { logout, isLoggedIn, searchQuery } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  console.log('roomfeed', searchQuery)
 
   const getRooms = async () => {
+    setError('');
     setIsLoading(true);
     const token = localStorage.getItem('token');
     
     if (!token) {
       setError('No token found');
+      setIsLoading(false);
+      navigate('/feed')
       return;
     }
 
@@ -31,8 +35,12 @@ const RoomFeed = ({ filterFunction }) => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+            logout();
+            navigate('/login')
+        }
         setIsLoading(false);
-        setError(data?.message || 'Failed to fetch rooms');
+        setError(data.message || 'Failed to fetch rooms');
         return;
       }
       
@@ -40,15 +48,11 @@ const RoomFeed = ({ filterFunction }) => {
       setRooms(data);
     } catch (error) {
         setIsLoading(false);
-      setError('An error occurred while fetching rooms');
-      console.error('Error fetching rooms:', error);
+        setError('An error occurred while fetching rooms');
+        console.error('Error fetching rooms:', error);
     }
   };
 
-  if (error && error == 'Token expired') {
-    logout();
-    navigate('/');
-  }
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -56,15 +60,21 @@ const RoomFeed = ({ filterFunction }) => {
     }
   }, [isLoggedIn]);
 
-  const filteredRooms = filterFunction ? rooms?.filter(filterFunction) : rooms;
+//   const filteredRooms = filterFunction ? rooms?.filter(filterFunction) : rooms;
+
+  const filteredRooms = rooms
+    .filter(room => filterFunction ? filterFunction(room) : true)
+    .filter(room => searchQuery ? room?.name?.toLowerCase().includes(searchQuery?.toLowerCase()) : true);
+
 
   return (
     <div>
       {error && 
-        <div class="alert alert-danger text-danger alert-dismissible fade show" role="alert">
+        <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
             {error}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>}
+            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        }
       <div className="d-flex justify-content-between">
         <div>
             <h5>Diskors</h5>

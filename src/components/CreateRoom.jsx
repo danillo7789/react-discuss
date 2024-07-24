@@ -48,6 +48,7 @@ const CreateRoom = () => {
 
   const postRoom = async (e) => {
     e.preventDefault();
+    setError('');
 
     if (!token) {
       setError('No token found');
@@ -74,7 +75,7 @@ const CreateRoom = () => {
       setName('');
       setTopic('');
       setDescription('');
-      navigate('/home');
+      navigate('/');
     } catch (error) {
       setError('An error occurred while creating room');
       console.error('Error creating room:', error);

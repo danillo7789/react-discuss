@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { decodeToken } from '../utils/decodeToken';
 
-
 // Create the context
 const AuthContext = createContext(undefined);
 
@@ -9,7 +8,8 @@ const AuthContext = createContext(undefined);
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, isLoggedIn, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, isLoggedIn, isLoading, login, logout, searchQuery, setSearchQuery }}>
       {children}
     </AuthContext.Provider>
   );

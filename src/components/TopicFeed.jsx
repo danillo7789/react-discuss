@@ -1,21 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import { baseUrl } from "../config/BaseUrl";
 import { useAuth } from "../authContext/context";
+import { useNavigate } from "react-router-dom";
 
 const TopicFeed = () => {
   const [error, setError] = useState('');
   const [topics, setTopics] = useState([]);
   const [topicCount, setTopicCount] = useState('');
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // console.log('topic feed rendered');
 
 
-  const getTopicDetails = async () => {
+  const getTopicDetails = useCallback(async () => {
+    setError('');
     setIsLoading(true);
     const token = localStorage.getItem('token');
     
     if (!token) {
       setError('No token found');
+      setIsLoading(false);
       return;
     }
 
@@ -31,9 +37,14 @@ const TopicFeed = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setIsLoading(false);
-        setError(data.message || 'Failed to fetch topics');
-        return;
+        if (data.message == 'Token expired, please login') {
+          logout()
+          navigate('/login')
+        } else {
+          setIsLoading(false);
+          setError(data.message || 'Failed to fetch topics');
+          return;
+        }
       }
 
       setIsLoading(false);
@@ -44,13 +55,13 @@ const TopicFeed = () => {
       setError('An error occurred while fetching topics');
       console.error('Error fetching topics:', error);
     }
-  };
+  }, [topics.length])
 
   useEffect(() => {
     if (isLoggedIn){
       getTopicDetails();
     }
-  }, []);
+  }, [isLoggedIn, topics.length]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -59,9 +70,9 @@ const TopicFeed = () => {
   return (
     <div className="px-2">
       {error && 
-        <div class="alert alert-danger text-danger alert-dismissible fade show" role="alert">
+        <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
             {error}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>}
       <h5 className="">Browse Topics</h5>
       <div className="d-flex justify-content-between">
@@ -80,4 +91,4 @@ const TopicFeed = () => {
   );
 };
 
-export default TopicFeed;
+export default memo(TopicFeed);

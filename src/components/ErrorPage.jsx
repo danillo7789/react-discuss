@@ -13,8 +13,8 @@ export default function ErrorPage() {
         <p>Sorry, an unexpected error has occurred.</p>
         <p>
           <p className="text-light">{error.statusText || error.message}</p>
-          {isLoggedIn ? <Link to='/home' className="btn btns text-light mt-2">Home</Link> :
-          <Link to='/' className="btn btns text-light mt-2">Back</Link>}
+          <Link to='/' className="btn btns text-light mt-2">Home</Link>
+          {/* <Link to='/' className="btn btns text-light mt-2">Back</Link> */}
           
         </p>
       </div>
