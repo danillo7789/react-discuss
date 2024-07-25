@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
+import { baseUrl } from '../config/BaseUrl';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -17,7 +18,7 @@ const Register = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/user/register', {
+      const response = await fetch(`${baseUrl}/api/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

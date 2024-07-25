@@ -4,6 +4,7 @@ import { useAuth } from "../authContext/context";
 import RoomCard from "./RoomCard";
 import '../App.css'
 import ActivityFeed from "./ActivityFeed";
+import { baseUrl } from "../config/BaseUrl";
 
 const RoomFeed = ({ filterFunction }) => {
   const [error, setError] = useState('');
@@ -32,7 +33,7 @@ const RoomFeed = ({ filterFunction }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/get/room-feed', {
+      const response = await fetch(`${baseUrl}/api/get/room-feed`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
