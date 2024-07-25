@@ -7,7 +7,7 @@ const Logout = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/feed');
+    navigate('/login');
   };
 
   return (

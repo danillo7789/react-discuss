@@ -15,7 +15,7 @@ function App() {
     if (!isLoading) {
       if (!isLoggedIn) {
         logout();
-        navigate('/feed');
+        navigate('/login');
       }
     }
   }, [isLoading, isLoggedIn, logout, navigate])
