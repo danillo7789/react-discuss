@@ -85,17 +85,6 @@ const UpdateRoom = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTopics();
-    fetchRoom();
-  }, []);
-
-  useEffect(() => {
-    // Set firstLoad to false once room data has been set
-    if (room.name || room.topic?.name || room.description) {
-      setFirstLoad(false);
-    }
-  }, [room]);
 
   const editRoom = async (e) => {
     e.preventDefault();
@@ -120,6 +109,10 @@ const UpdateRoom = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Error updating room');
         return;
       }
@@ -133,6 +126,18 @@ const UpdateRoom = () => {
       console.error('Error updating room:', error);
     }
   };
+
+  useEffect(() => {
+    fetchTopics();
+    fetchRoom();
+  }, []);
+
+  useEffect(() => {
+    // Set firstLoad to false once room data has been set
+    if (room.name || room.topic?.name || room.description) {
+      setFirstLoad(false);
+    }
+  }, [room]);
 
   if (isLoading) return <div>Loading...</div>
 

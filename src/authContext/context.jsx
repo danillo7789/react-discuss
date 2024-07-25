@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [topicFilter, setTopicFilter] = useState('');
 
 
   useEffect(() => {
@@ -40,8 +41,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, isLoggedIn, isLoading, login, logout, searchQuery, setSearchQuery }}>
-      {children}
+    <AuthContext.Provider value={{
+        currentUser, 
+        isLoggedIn, 
+        isLoading, 
+        login, 
+        logout, 
+        searchQuery, 
+        setSearchQuery,
+        topicFilter,
+        setTopicFilter 
+      }}>
+        {children}
     </AuthContext.Provider>
   );
 };

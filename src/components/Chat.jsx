@@ -10,7 +10,7 @@ const Chat = ({ chat, deleteChat, isLoading }) => {
     // console.log('chats rendered');
 
   return (
-    <div className='chat border-start border-primary px-3 mb-2 bg-element-light rounded py-3'>
+    <div className='border-start border-primary px-3 mb-2 bg-element-light rounded py-3'>
         {isLoading ? <div>Loading...</div> : (
         <div>
             <div className='d-flex justify-content-between'>

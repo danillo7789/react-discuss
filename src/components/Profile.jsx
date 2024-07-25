@@ -4,7 +4,7 @@ import { baseUrl } from '../config/BaseUrl';
 import Navbar from './Navbar';
 import RoomFeed from './RoomFeed';
 import ActivityFeed from './ActivityFeed';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import '../App.css'
 
 const Profile = () => {
@@ -15,6 +15,7 @@ const Profile = () => {
   const { currentUser, isLoggedIn } = useAuth();
   const { id } = useParams()
   const blank_img = import.meta.env.VITE_BLANK_IMG;
+  const navigate = useNavigate();
 
 
 
@@ -23,6 +24,8 @@ const Profile = () => {
 
     if (!token) {
       setError('Token not found');
+      setIsLoading(false);
+      navigate('/login')
       return;
     }
 
@@ -88,7 +91,9 @@ const Profile = () => {
                 </div>
                 )}
                 <div>
+                  <div className='d-flex justify-content-center'>
                     <img className="profile-pic rounded-circle mb-4" src={user?.profilePicture?.url || blank_img} alt="display picture" />
+                  </div>
                     <div className='d-flex justify-content-between'>
                         <div>
                             <div className='mb-4'><h6>Username: </h6> <div className='text-light'>{user?.username}</div></div>

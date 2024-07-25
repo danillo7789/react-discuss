@@ -9,6 +9,7 @@ import Chat from './Chat';
 
 const Room = () => {
   const [room, setRoom] = useState({});
+  const [chats, setChats] = useState([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
@@ -18,6 +19,7 @@ const Room = () => {
   const [chatDeleted, setChatDeleted] = useState(false);
   const navigate = useNavigate();
   const blank_img = import.meta.env.VITE_BLANK_IMG;
+  const [showActivity, setShowActivity] = useState(false);
 
   // console.log('room rendered');
 
@@ -44,6 +46,10 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Failed to fetch room');
         setIsLoading(false);
         return;
@@ -66,7 +72,7 @@ const Room = () => {
       return;
     }
 
-    const tempId = Date.now(); // Generate a temporary ID for the new chat
+    const tempId = Date.now(); // Generating a temporary ID for the new chat
     const newChat = {
       _id: tempId,
       sender: { username: currentUser?.username }, 
@@ -74,7 +80,7 @@ const Room = () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Optimistically update the state instantly
+    // updating the state instantly
     setRoom(prevRoom => ({
       ...prevRoom,
       chats: [...prevRoom.chats, newChat],
@@ -94,6 +100,10 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Error sending message');
         setIsLoading(false);
         return;
@@ -141,6 +151,10 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Failed to fetch chats');
         return;
       }
@@ -150,6 +164,8 @@ const Room = () => {
         chats: data.chats, // also updating chats
         participants: data.updatedRoom.participants //also updating participants
       }));
+
+      setChats(data.chats)
     } catch (error) {
       setError('An error occurred while fetching chats');
       console.error('An error occurred while fetching chats', error);
@@ -221,6 +237,9 @@ const Room = () => {
     }
   };
   
+  const handleActivity = () => {
+    setShowActivity(!showActivity);
+  }
 
   useEffect(() => {
     getRoom();
@@ -241,6 +260,7 @@ const Room = () => {
 
       <div className='container'>
         <div className="row pt-3">
+          {!showActivity && (
           <div className="col-lg-9">
             {error && 
               <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
@@ -248,6 +268,10 @@ const Room = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             }
+
+            <div id='toggle-participants' onClick={handleActivity} className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'>
+              {showActivity ? 'Hide Participants' : 'Show Participants'}
+            </div>
 
             <div className='bg-elements border border-0 rounded-3'>  
                 <div className='heading px-4 pt-2'>
@@ -277,7 +301,6 @@ const Room = () => {
                         </div>
                         <div className="d-flex mb-2">
                         <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
-                        {/* <small className='dim'>@{room?.host?.username}</small> */}
                         </div>
                         <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text">{room?.topic?.name}</small>
                     </div>
@@ -313,9 +336,33 @@ const Room = () => {
                 
               </div>
             </div>
-          </div>
+          </div>)}
 
-          <div className="col-lg-3">
+          {showActivity && (
+          <div>
+            <div onClick={handleActivity} className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'>
+              {showActivity ? 'Hide Participants' : 'Show Participants'}
+            </div>
+
+            <div className="col-lg-3">
+              <div className='bg-elements border border-0 rounded-3'>
+                <div className='heading d-flex justify-content-between px-4 pt-2'>
+                  PARTICIPANTS <small>({room?.participants?.length} Joined)</small>
+                </div>
+
+                <div className='px-4 py-3'>
+                  {room?.participants?.map(user => (
+                    <div key={user?._id} className="d-flex mb-2">
+                      <img className="rounded-circle me-2 display-pic" src={user?.profilePicture?.url || blank_img} alt="display picture" />
+                      <Link className='linkc' to={`/profile/${user?._id}`}><small className='dim mt-2'>@{user?.username}</small></Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>)}
+
+          <div id='participants' className='col-lg-3' >
             <div className='bg-elements border border-0 rounded-3'>
               <div className='heading d-flex justify-content-between px-4 pt-2'>
                 PARTICIPANTS <small>({room?.participants?.length} Joined)</small>
@@ -331,6 +378,7 @@ const Room = () => {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

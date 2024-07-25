@@ -43,9 +43,9 @@ const Login = () => {
     }
   }
 
-//   if (isLoggedIn) {
-//     navigate('/');
-//   }
+  if (isLoggedIn) {
+    navigate('/');
+  }
 
 
   return (

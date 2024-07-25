@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../authContext/context";
 import RoomCard from "./RoomCard";
+import '../App.css'
+import ActivityFeed from "./ActivityFeed";
 
 const RoomFeed = ({ filterFunction }) => {
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
-  const { logout, isLoggedIn, searchQuery } = useAuth();
+  const { logout, isLoggedIn, searchQuery, topicFilter, setTopicFilter } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  console.log('roomfeed', searchQuery)
+  const [visibleActivity, setVisibleActivity] = useState(false)
+  const { id } = useParams()
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const handleActivity = () => {
+    setVisibleActivity(!visibleActivity)
+  }
 
   const getRooms = async () => {
     setError('');
@@ -19,7 +28,6 @@ const RoomFeed = ({ filterFunction }) => {
     if (!token) {
       setError('No token found');
       setIsLoading(false);
-      navigate('/feed')
       return;
     }
 
@@ -64,7 +72,16 @@ const RoomFeed = ({ filterFunction }) => {
 
   const filteredRooms = rooms
     .filter(room => filterFunction ? filterFunction(room) : true)
-    .filter(room => searchQuery ? room?.name?.toLowerCase().includes(searchQuery?.toLowerCase()) : true);
+    .filter(room => searchQuery ? room?.name?.toLowerCase().includes(searchQuery?.toLowerCase()) : true)
+    .filter(room => topicFilter ? room?.topic?.name?.toLowerCase() === topicFilter.toLowerCase() : true);
+
+    const filterActivitiesByHost = (activity) => activity?.room?.host?._id === id || activity
+
+    const handleTopic = () => {
+        if (currentPath === '/topics') {
+            window.location.reload()
+        }
+    }
 
 
   return (
@@ -75,22 +92,46 @@ const RoomFeed = ({ filterFunction }) => {
             <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         }
-      <div className="d-flex justify-content-between">
+
+        {!visibleActivity &&
+        (<div id="mobile-btn-roomfeed">
+            <div id="mobile-btns" className="d-flex justify-content-center mb-3">
+                <Link onClick={handleActivity} className="linkc px-3 py-2 border border-secondary rounded-pill btn btnm me-3">Recent Activities</Link>
+                <div id='browse-topics-btn'>
+                    <Link to='/topics' onClick={handleTopic} className="linkc px-3 py-2 border border-secondary rounded-pill btn btnm">Browse Topics</Link>
+                </div>                
+            </div>
+        </div>)}
+
+        {visibleActivity && 
+        (<div id={visibleActivity ? '' : 'activityfeedp'} className="col-lg-3 overflow">
+            <ActivityFeed 
+                filterFunc={filterActivitiesByHost} 
+                visibleActivity={visibleActivity}
+                setVisibleActivity={setVisibleActivity} />
+        </div>)}
+        
+
+      {!visibleActivity &&
+      (<div className="d-flex justify-content-between">
         <div>
             <h5>Diskors</h5>
-            <h6 className="dark">{filteredRooms?.length} rooms available</h6>
+            <h6 className="dark">{filteredRooms?.length} rooms available</h6>            
         </div>
-        <div>
-            <Link to='/create-room'><button className="btn btns">Create Room</button></Link>
+        <div className="d-flex">
+            <Link to='/create-room'><button className="btn btns me-2">Create Room</button></Link>
+            <Link onClick={()=> setTopicFilter('')} >
+                <button className="btn btns me-2">All Rooms</button>
+            </Link>
         </div>
-      </div>
+      </div>)}
 
 
       {isLoading ? (
         <div>Loading...</div>
-      ) : filteredRooms.length > 0 ? (
+      ) : filteredRooms.length > 0 && !visibleActivity ? (
         filteredRooms.map((room) => <RoomCard key={room?._id} room={room} />)
-      ) : (
+      ) : !visibleActivity && (
         <p>No rooms available</p>
       )}
     </div>

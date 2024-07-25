@@ -39,7 +39,7 @@ const EditProfile = () => {
     try {
         const controller = new AbortController();
         const signal = controller.signal;
-        const timeoutId = setTimeout(() => controller.abort(), 60000); // 1 minute
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes
 
       const response = await fetch(`${baseUrl}/api/user-update/${id}`, {
         method: 'PUT',
@@ -55,6 +55,10 @@ const EditProfile = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Error updating user profile');
         setIsLoading(false);
         return;

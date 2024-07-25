@@ -14,6 +14,9 @@ import CreateRoom from './components/CreateRoom.jsx';
 import UpdateRoom from './components/UpdateRoom.jsx';
 import Profile from './components/Profile.jsx';
 import EditProfile from './components/EditProfile.jsx';
+import BrowseTopics from './components/BrowseTopics.jsx';
+import ActivityFeed from './components/ActivityFeed.jsx';
+import RoomFeed from './components/RoomFeed.jsx';
 
 const router = createBrowserRouter([
   {
@@ -66,6 +69,21 @@ const router = createBrowserRouter([
     element: <EditProfile />,
     errorElement: <ErrorPage />
   },
+  {
+    path: "topics",
+    element: <BrowseTopics />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "activities",
+    element: <ActivityFeed />,
+    errorElement: <ErrorPage />
+  },
+  // {
+  //   path: "roomfeed",
+  //   element: <RoomFeed />,
+  //   errorElement: <ErrorPage />
+  // },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

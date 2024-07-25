@@ -3,6 +3,7 @@ import { baseUrl } from '../config/BaseUrl';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
+import { useAuth } from '../authContext/context';
 
 const CreateRoom = () => {
   const token = localStorage.getItem('token');
@@ -12,6 +13,7 @@ const CreateRoom = () => {
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { logout } = useAuth()
 
   const fetchTopics = async () => {
     if (!token) {
@@ -31,6 +33,10 @@ const CreateRoom = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Failed to fetch topics');
         return;
       }
@@ -52,6 +58,7 @@ const CreateRoom = () => {
 
     if (!token) {
       setError('No token found');
+      navigate('/login')
       return;
     }
 
@@ -68,6 +75,10 @@ const CreateRoom = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
         setError(data.message || 'Error creating room');
         return;
       }
@@ -75,7 +86,7 @@ const CreateRoom = () => {
       setName('');
       setTopic('');
       setDescription('');
-      navigate('/');
+      navigate(`/room/${data._id}`);
     } catch (error) {
       setError('An error occurred while creating room');
       console.error('Error creating room:', error);
@@ -86,7 +97,7 @@ const CreateRoom = () => {
     <div>
       <Navbar />
       <div className="container">
-        <div className="row pt-3">
+        <div className="row pt-5">
             <div className="col-lg-3"></div>
             <div className="col-lg-6">
                 {error && 
