@@ -4,17 +4,19 @@ import Navbar from "./Navbar";
 import BackLink from "./BackLink";
 import { baseUrl } from "../config/BaseUrl";
 import RoomFeed from "./RoomFeed";
+import { useNavigate } from "react-router-dom";
 
 
 const BrowseTopics = () => {
     const token = localStorage.getItem('token');
     const [search, setSearch] = useState('');
-    const { isLoggedIn, setTopicFilter } = useAuth();
+    const { isLoggedIn, setTopicFilter, logout } = useAuth();
     const [error, setError] = useState('');
     const [topics, setTopics] = useState([]);
     const [topicCount, setTopicCount] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [topicClicked, setTopicClicked] = useState(false);
+    const navigate = useNavigate();
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
@@ -118,7 +120,15 @@ const BrowseTopics = () => {
                             </div>
 
                             {isLoading ? (
-                                <div>Loading...</div>
+                                (
+                                  <div className="container-fluid full-height d-flex justify-content-center align-items-center">
+                                    <div className="text-center">
+                                        <div className="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                  </div>
+                                )
                             ) : (
                                 topics.length > 0 ? (
                                     (search === '' ? fiveTopics : topics)

@@ -14,6 +14,7 @@ const CreateRoom = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { logout } = useAuth()
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchTopics = async () => {
     if (!token) {
@@ -54,6 +55,7 @@ const CreateRoom = () => {
 
   const postRoom = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     setError('');
 
     if (!token) {
@@ -86,6 +88,7 @@ const CreateRoom = () => {
       setName('');
       setTopic('');
       setDescription('');
+      setIsLoading(false)
       navigate(`/room/${data._id}`);
     } catch (error) {
       setError('An error occurred while creating room');
@@ -149,7 +152,7 @@ const CreateRoom = () => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
                         </div>
-                        <button className='btn btns' type="submit">Create Room</button>
+                        <button className='btn btns' type="submit">{isLoading ? 'Creating...' : 'Create Room'}</button>
                     </form>
                 </div>
             </div>

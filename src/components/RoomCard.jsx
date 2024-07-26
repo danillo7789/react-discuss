@@ -11,7 +11,9 @@ const RoomCard = ({ room }) => {
         <div className="d-flex justify-content-between mb-2">
             <div className="d-flex">
                 <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
-                <Link className="linkc" to={`profile/${room?.host?._id}`}><small className="dim pt-2">@{room?.host?.username}</small></Link>
+                <Link className="linkc" to={`/profile/${room?.host?._id}`}>
+                    <small className="dim pt-2">@{room?.host?.username}</small>
+                </Link>
             </div>
             <div className="pt-2">{moment(room?.createdAt).fromNow()}</div>
         </div>

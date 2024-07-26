@@ -82,7 +82,15 @@ const Profile = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>}
 
-            {isLoading ? <div>Loading...</div> : 
+            {isLoading ? (
+              <div className="container-fluid full-height d-flex justify-content-center align-items-center">
+                <div className="text-center">
+                    <div className="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+              </div>
+            ) : 
             (<div id='topicfeedp' className="col-lg-3 sticky-col">
                 {error && (
                 <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">

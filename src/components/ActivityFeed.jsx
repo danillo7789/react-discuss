@@ -91,7 +91,15 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity }) => {
               </div>
               <div></div>            
             </div>
-            {isLoading ? (<div>Loading...</div>) : 
+            {isLoading ? (
+              <div className="container-fluid full-height d-flex justify-content-center align-items-center">
+                <div className="text-center">
+                    <div className="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+              </div>
+            ) : 
             (<div className='px-3 py-3 '>
               {filteredActivities.length > 0 ? filteredActivities?.map(activity => (
                 <div key={activity?._id} className="border border-secondary rounded mb-2">

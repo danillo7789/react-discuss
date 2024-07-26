@@ -273,21 +273,28 @@ const Room = () => {
               {showActivity ? 'Hide Participants' : 'Show Participants'}
             </div>
 
-            <div className='bg-elements border border-0 rounded-3'>  
-                <div className='heading px-4 pt-2'>
-                    {isLoading ? (<div>Loading...</div>) : (
-                    <div className='d-flex justify-content-between'>
-                        <BackLink />
-                        {room && room?.host?._id === currentUser?.id && (
-                            <div className='d-flex'>
-                                <Link className='linkc' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
-                                <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
-                            </div>
-                        )}                                 
-                    </div>)}
+            <div className='bg-elements border border-0 rounded-3'> 
+              {isLoading ? (
+                <div className="container-fluid full-height d-flex justify-content-center align-items-center">
+                  <div className="text-center">
+                      <div className="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
+                          <span className="visually-hidden">Loading...</span>
+                      </div>
+                  </div>
                 </div>
+              ): 
+              (<div className='heading px-4 pt-2'>
+                  <div className='d-flex justify-content-between'>
+                      <BackLink />
+                      {room && room?.host?._id === currentUser?.id && (
+                          <div className='d-flex'>
+                              <Link className='linkc' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
+                              <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
+                          </div>
+                      )}                                 
+                  </div>
+              </div>)}
                 
-                {isLoading ? <div>Loading...</div> : (
                 <div>
                     <div className="d-flex justify-content-between px-4 py-3">
                         <h4 className='fw-bold'>{room?.name}</h4>
@@ -304,7 +311,7 @@ const Room = () => {
                         </div>
                         <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text">{room?.topic?.name}</small>
                     </div>
-                </div>)}
+                </div>
 
               <div className='px-4 pb-3'>
 

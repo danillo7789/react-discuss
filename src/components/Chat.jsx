@@ -11,7 +11,6 @@ const Chat = ({ chat, deleteChat, isLoading }) => {
 
   return (
     <div className='border-start border-primary px-3 mb-2 bg-element-light rounded py-3'>
-        {isLoading ? <div>Loading...</div> : (
         <div>
             <div className='d-flex justify-content-between'>
                 <div className="d-flex f-sm pb-2">
@@ -28,7 +27,7 @@ const Chat = ({ chat, deleteChat, isLoading }) => {
                 </div>
             </div>
             <div className='text-light px-1'>{chat?.text}</div>
-        </div>)}
+        </div>
     </div>
   )
 }
