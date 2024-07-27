@@ -3,7 +3,7 @@ import { baseUrl } from '../config/BaseUrl';
 import { useAuth } from '../authContext/context';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const EditProfile = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ const EditProfile = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [preview, setPreview] = useState('');
   const { currentUser } = useAuth();
-  const id = currentUser?.id;
+  const { id } = useParams()
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
@@ -66,7 +66,7 @@ const EditProfile = () => {
 
       setUser(data);
       setIsLoading(false);
-      navigate(`/profile/${user?._id}`)
+      navigate(`/profile/${id}`)
     } catch (error) {
         if (error.name === 'AbortError') {
           setError('Request timed out');

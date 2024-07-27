@@ -6,7 +6,7 @@ import { useAuth } from '../authContext/context';
 import BackLink from './BackLink';
 import Navbar from './Navbar';
 
-const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity }) => {
+const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterActivity }) => {
   const [error, setError] = useState('');
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +64,7 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity }) => {
   // const filteredActivities = filterFunc ? activities.filter(filterFunc) : activities;
 
   const filteredActivities = activities
-    .filter(activity => filterFunc ? filterFunc(activity) : true)
+    .filter(activity => filterFunc ? filterFunc(activity) : filterActivity ? filterActivity(activity) : true)
     .filter(activity => searchQuery ? activity?.room?.name?.toLowerCase().includes(searchQuery?.toLowerCase())
       || activity?.text?.toLowerCase().includes(searchQuery?.toLowerCase()) : true)
     .filter(activity => topicFilter ? activity?.room?.topic?.name?.toLowerCase() === topicFilter.toLowerCase() : true);

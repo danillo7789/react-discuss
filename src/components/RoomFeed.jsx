@@ -107,7 +107,7 @@ const RoomFeed = ({ filterFunction }) => {
         {visibleActivity && 
         (<div id={visibleActivity ? '' : 'activityfeedp'} className="col-lg-3 overflow">
             <ActivityFeed 
-                filterFunc={filterActivitiesByHost} 
+                filterActivity={filterActivitiesByHost} 
                 visibleActivity={visibleActivity}
                 setVisibleActivity={setVisibleActivity} />
         </div>)}

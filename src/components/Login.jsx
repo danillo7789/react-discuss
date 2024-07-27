@@ -8,11 +8,13 @@ const Login = () => {
   const [access, setAccess] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login, isLoggedIn } = useAuth();
 
   const handleSubmit = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
     setError('');
 
@@ -30,14 +32,17 @@ const Login = () => {
             const token = data.token;
             login(token);
             
+            setIsLoading(false);
             setAccess('');
             setPassword('');
             navigate('/');
         } else {
+            setIsLoading(false);
             setError(data.message);
             console.error('Error loggin user in');
         }
     } catch (error) {
+        setIsLoading(false);
         setError('Error logging in. Please try again.');
         console.error('Error logging in:', error);
     }
@@ -61,7 +66,7 @@ const Login = () => {
                         <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     }
-                    <form className='form-width' onSubmit={handleSubmit}>
+                    <form className='form-width mb-3' onSubmit={handleSubmit}>
                         <div>
                             <label className='pb-2'>Email</label>
                             <input
@@ -84,7 +89,7 @@ const Login = () => {
                                 required
                             />
                         </div>
-                        <button className='btn btns' type="submit">Login</button>
+                        <button className='btn btns' type="submit">{isLoading ? 'Logging in...' : 'Login'}</button>
                     </form>
                     <p className='d-flex'>Don't have an account? <Link className='nav-link nav-text px-2 text-info' to='/register'>Register</Link></p>
                 </div>
