@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
           console.log('refreshed token data', data);
           const newToken = data.token;
           setToken(newToken);
-          setCookie('token', newToken, { path: '/', maxAge: 60 }); // Update token in cookies
+          setCookie('token', newToken, { path: '/', maxAge: 600 }); // Update token in cookies
 
           // Retry the original request with the new token
           response = await fetch(url, {
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
 
           const data = await response.json();
           if (response.ok) {
-            setCookie('token', data.token, { path: '/', maxAge: 60 }); // Set new token in cookies
+            setCookie('token', data.token, { path: '/', maxAge: 600 }); // Set new token in cookies
             const decoded = decodeToken(data.token);
             if (decoded) {
               setCurrentUser(decoded.user);
