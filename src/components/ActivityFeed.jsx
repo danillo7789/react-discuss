@@ -21,6 +21,9 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterA
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();

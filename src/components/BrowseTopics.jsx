@@ -30,17 +30,14 @@ const BrowseTopics = () => {
 
     const getTopicDetails = useCallback(async () => {
         setError('');
-        setIsLoading(true);
-        
-        // if (!token) {
-        //   setError('No token found');
-        //   setIsLoading(false);
-        //   return;
-        // }
+        setIsLoading(true);      
     
         try {
           const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
             method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
           });
     
           const data = await response.json();

@@ -26,6 +26,9 @@ const TopicFeed = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();

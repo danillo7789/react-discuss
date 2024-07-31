@@ -29,6 +29,9 @@ const Room = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
@@ -73,6 +76,9 @@ const Room = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/post-chat/${id}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ message }),
       });
 
@@ -116,6 +122,9 @@ const Room = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats/${id}`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
@@ -147,6 +156,9 @@ const Room = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-chat/${chatId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
@@ -170,6 +182,9 @@ const Room = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-room/${roomId}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
   
       const data = await response.json();

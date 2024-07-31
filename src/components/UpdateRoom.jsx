@@ -23,6 +23,9 @@ const UpdateRoom = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
@@ -44,6 +47,9 @@ const UpdateRoom = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
@@ -74,6 +80,9 @@ const UpdateRoom = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/update-room/${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ name, topic, description })
       });
 

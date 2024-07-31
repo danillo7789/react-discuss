@@ -43,6 +43,9 @@ const EditProfile = () => {
 
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/user-update/${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: formData,
         signal: signal
       });

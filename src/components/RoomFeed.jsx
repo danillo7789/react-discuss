@@ -37,6 +37,9 @@ const RoomFeed = ({ filterFunction }) => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room-feed`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();

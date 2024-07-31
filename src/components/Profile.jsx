@@ -24,6 +24,9 @@ const Profile = () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/user/${id}`, {
         method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
