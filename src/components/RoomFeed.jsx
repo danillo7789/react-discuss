@@ -5,17 +5,19 @@ import RoomCard from "./RoomCard";
 import '../App.css'
 import ActivityFeed from "./ActivityFeed";
 import { baseUrl } from "../config/BaseUrl";
+// import { fetchWithTokenRefresh } from "../utils/refreshToken";
 
 const RoomFeed = ({ filterFunction }) => {
   const [error, setError] = useState('');
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
-  const { logout, isLoggedIn, searchQuery, topicFilter, setTopicFilter } = useAuth();
+  const { logout, isLoggedIn, searchQuery, topicFilter, setTopicFilter, fetchWithTokenRefresh } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [visibleActivity, setVisibleActivity] = useState(false)
   const { id } = useParams()
   const location = useLocation();
   const currentPath = location.pathname;
+  
 
   const handleActivity = () => {
     setVisibleActivity(!visibleActivity)
@@ -24,21 +26,17 @@ const RoomFeed = ({ filterFunction }) => {
   const getRooms = async () => {
     setError('');
     setIsLoading(true);
-    const token = localStorage.getItem('token');
+    // const token = localStorage.getItem('token');
     
-    if (!token) {
-      setError('No token found');
-      setIsLoading(false);
-      return;
-    }
+    // if (!token) {
+    //   setError('No token found');
+    //   setIsLoading(false);
+    //   return;
+    // }
 
     try {
-      const response = await fetch(`${baseUrl}/api/get/room-feed`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room-feed`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();

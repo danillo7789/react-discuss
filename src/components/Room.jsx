@@ -13,7 +13,7 @@ const Room = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
-  const { isLoggedIn, currentUser } = useAuth();
+  const { isLoggedIn, currentUser, fetchWithTokenRefresh } = useAuth();
   const [message, setMessage] = useState('');
   const [chatPosted, setChatPosted] = useState(false);
   const [chatDeleted, setChatDeleted] = useState(false);
@@ -23,24 +23,12 @@ const Room = () => {
 
   // console.log('room rendered');
 
-  const token = localStorage.getItem('token');
-
   const getRoom = async () => {
     setIsLoading(true);
 
-    if (!token) {
-      setError('No token found');
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/room/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();
@@ -66,12 +54,7 @@ const Room = () => {
 
   const postChat = async (e) => {
     e.preventDefault();
-    
-    if (!token) {
-      setError('No token found');
-      return;
-    }
-
+  
     const tempId = Date.now(); // Generating a temporary ID for the new chat
     const newChat = {
       _id: tempId,
@@ -88,12 +71,8 @@ const Room = () => {
     setMessage('');
 
     try {
-      const response = await fetch(`${baseUrl}/api/post-chat/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/post-chat/${id}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify({ message }),
       });
 
@@ -134,18 +113,9 @@ const Room = () => {
   };
 
   const getChats = async () => {
-    if (!token) {
-      setError('No token found');
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/chats/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats/${id}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();
@@ -173,18 +143,10 @@ const Room = () => {
   };
 
   const deleteChat = async (chatId) => {
-    if (!token) {
-      setError('No token found');
-      return;
-    }
     setChatDeleted(true)
     try {
-      const response = await fetch(`${baseUrl}/api/delete-chat/${chatId}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-chat/${chatId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
       });
 
       const data = await response.json();
@@ -205,19 +167,9 @@ const Room = () => {
     setIsLoading(true);
     setError(''); 
   
-    if (!token) {
-      setIsLoading(false);
-      setError('No token found');
-      return;
-    }
-  
     try {
-      const response = await fetch(`${baseUrl}/api/delete-room/${roomId}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-room/${roomId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
       });
   
       const data = await response.json();

@@ -3,9 +3,9 @@ import { baseUrl } from '../config/BaseUrl';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
+import { useAuth } from '../authContext/context';
 
 const UpdateRoom = () => {
-  const token = localStorage.getItem('token');
   const [name, setName] = useState('');
   const [topic, setTopic] = useState('');
   const [topics, setTopics] = useState([]);
@@ -17,20 +17,12 @@ const UpdateRoom = () => {
   const [updating, setUpdating] = useState(false); 
   const navigate = useNavigate();
   const { id } = useParams();
+  const { fetchWithTokenRefresh } = useAuth();
 
   const fetchTopics = async () => {
-    if (!token) {
-      setError('No token found');
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/topic-feed`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
       });
 
       const data = await response.json();
@@ -49,20 +41,9 @@ const UpdateRoom = () => {
 
   const fetchRoom = async () => {
     setIsLoading(true);
-
-    if (!token) {
-      setError('No token found');
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/room/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();
@@ -85,24 +66,14 @@ const UpdateRoom = () => {
     }
   };
 
-
   const editRoom = async (e) => {
     e.preventDefault();
     setUpdating(true)
     setError('');
 
-    if (!token) {
-      setError('No token found');
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/update-room/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/update-room/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ name, topic, description })
       });
 

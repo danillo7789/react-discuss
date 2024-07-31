@@ -4,35 +4,23 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import BackLink from './BackLink';
-import Navbar from './Navbar';
 
 const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterActivity }) => {
   const [error, setError] = useState('');
   const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const token = localStorage.getItem('token');
   const blank_img = import.meta.env.VITE_BLANK_IMG;
-  const { searchQuery, topicFilter } = useAuth();
+  const { searchQuery, topicFilter, fetchWithTokenRefresh } = useAuth();
   
   // console.log('activity feed rendered');
 
   const getAllChats = async () => {
     setError('')
     setIsLoading(true)
-    
-    if (!token) {
-      setError('No token found');
-      setIsLoading(false)
-      return;
-    }
 
     try {
-      const response = await fetch(`${baseUrl}/api/get/chats`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();

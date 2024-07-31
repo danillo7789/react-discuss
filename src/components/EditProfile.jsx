@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import BackLink from './BackLink';
 import { useNavigate, useParams } from 'react-router-dom';
 
+
 const EditProfile = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -12,9 +13,8 @@ const EditProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [preview, setPreview] = useState('');
-  const { currentUser } = useAuth();
+  const { currentUser, fetchWithTokenRefresh } = useAuth();
   const { id } = useParams()
-  const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
@@ -41,11 +41,8 @@ const EditProfile = () => {
         const signal = controller.signal;
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes
 
-      const response = await fetch(`${baseUrl}/api/user-update/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/user-update/${id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         body: formData,
         signal: signal
       });

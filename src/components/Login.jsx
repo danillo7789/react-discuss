@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
@@ -11,7 +11,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login, isLoggedIn } = useAuth();
+  const { isLoggedIn, login, setCookie } = useAuth();
 
   const handleSubmit = async (e) => {
     setIsLoading(true);
@@ -24,14 +24,16 @@ const Login = () => {
             headers: {
             'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ access, password }),
         });
 
         const data = await response.json();
         if (response.ok) {
             const token = data.token;
-            login(token);
-            
+      
+            login(token)
+            setCookie('token', token, { path: '/', maxAge: 60 });
             setIsLoading(false);
             setAccess('');
             setPassword('');
@@ -48,9 +50,11 @@ const Login = () => {
     }
   }
 
-  if (isLoggedIn) {
-    navigate('/');
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+        navigate('/');
+    }
+  }, [isLoggedIn])
 
 
   return (

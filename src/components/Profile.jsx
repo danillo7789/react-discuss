@@ -8,11 +8,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import '../App.css'
 
 const Profile = () => {
-  const token = localStorage.getItem('token');
   const [user, setUser] = useState({});
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser, isLoggedIn } = useAuth();
+  const { currentUser, isLoggedIn, fetchWithTokenRefresh } = useAuth();
   const { id } = useParams()
   const blank_img = import.meta.env.VITE_BLANK_IMG;
   const navigate = useNavigate();
@@ -22,20 +21,9 @@ const Profile = () => {
   const getUser = async (id) => {
     setIsLoading(true);
 
-    if (!token) {
-      setError('Token not found');
-      setIsLoading(false);
-      navigate('/login')
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/user/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/user/${id}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();

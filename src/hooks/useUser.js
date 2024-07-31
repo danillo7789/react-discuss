@@ -5,19 +5,14 @@ import { baseUrl } from '../config/BaseUrl';
 const useUser = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  const { currentUser } = useAuth();
-  const token = localStorage.getItem('token');
+  const { currentUser, fetchWithTokenRefresh } = useAuth();
   const id = currentUser?.id;
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/get/user/${id}`, {
+        const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/user/${id}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
         });
 
         const data = await response.json();
@@ -34,10 +29,10 @@ const useUser = () => {
       }
     };
 
-    if (id && token) {
+    if (id) {
       fetchUser();
     }
-  }, [id, token]);
+  }, [id]);
 
   return { user, error };
 };

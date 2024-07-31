@@ -5,30 +5,21 @@ import Navbar from './Navbar';
 import BackLink from './BackLink';
 import { useAuth } from '../authContext/context';
 
+
 const CreateRoom = () => {
-  const token = localStorage.getItem('token');
   const [name, setName] = useState('');
   const [topic, setTopic] = useState('');
   const [topics, setTopics] = useState([]);
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { logout } = useAuth()
+  const { logout, fetchWithTokenRefresh } = useAuth()
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchTopics = async () => {
-    if (!token) {
-      setError('No token found');
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/get/topic-feed`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
       });
 
       const data = await response.json();
@@ -58,19 +49,9 @@ const CreateRoom = () => {
     setIsLoading(true);
     setError('');
 
-    if (!token) {
-      setError('No token found');
-      navigate('/login')
-      return;
-    }
-
     try {
-      const response = await fetch(`${baseUrl}/api/create-room`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/create-room`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ name, topic, description })
       });
 

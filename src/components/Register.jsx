@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import { baseUrl } from '../config/BaseUrl';
+// import { fetchWithTokenRefresh } from '../utils/refreshToken';
 
 const Register = () => {
   const [username, setUsername] = useState('');

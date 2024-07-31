@@ -7,7 +7,7 @@ const TopicFeed = () => {
   const [error, setError] = useState('');
   const [topics, setTopics] = useState([]);
   const [topicCount, setTopicCount] = useState('');
-  const { isLoggedIn, logout, setTopicFilter } = useAuth();
+  const { isLoggedIn, logout, setTopicFilter, fetchWithTokenRefresh } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -19,25 +19,13 @@ const TopicFeed = () => {
 
   // console.log('topic feed rendered');
 
-
   const getTopicDetails = useCallback(async () => {
     setError('');
     setIsLoading(true);
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      setError('No token found');
-      setIsLoading(false);
-      return;
-    }
 
     try {
-      const response = await fetch(`${baseUrl}/api/get/topic-feed`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       const data = await response.json();

@@ -11,7 +11,7 @@ const Logout = () => {
   };
 
   return (
-    <li onClick={handleLogout}><p className='dropdown-item pointer' onClick={logout}>Logout</p></li>
+    <li onClick={handleLogout}><p className='dropdown-item pointer'>Logout</p></li>
   );
 };
 

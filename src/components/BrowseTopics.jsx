@@ -8,9 +8,9 @@ import { useNavigate } from "react-router-dom";
 
 
 const BrowseTopics = () => {
-    const token = localStorage.getItem('token');
+    // const token = localStorage.getItem('token');
     const [search, setSearch] = useState('');
-    const { isLoggedIn, setTopicFilter, logout } = useAuth();
+    const { isLoggedIn, setTopicFilter, logout, fetchWithTokenRefresh } = useAuth();
     const [error, setError] = useState('');
     const [topics, setTopics] = useState([]);
     const [topicCount, setTopicCount] = useState('');
@@ -32,19 +32,15 @@ const BrowseTopics = () => {
         setError('');
         setIsLoading(true);
         
-        if (!token) {
-          setError('No token found');
-          setIsLoading(false);
-          return;
-        }
+        // if (!token) {
+        //   setError('No token found');
+        //   setIsLoading(false);
+        //   return;
+        // }
     
         try {
-          const response = await fetch(`${baseUrl}/api/get/topic-feed`, {
+          const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
             method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
           });
     
           const data = await response.json();
