@@ -19,7 +19,7 @@ const CreateRoom = () => {
   const fetchTopics = async () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
-        method: 'GET',s
+        method: 'GET',
       });
 
       const data = await response.json();
