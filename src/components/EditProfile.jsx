@@ -4,8 +4,6 @@ import { useAuth } from '../authContext/context';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../config/axiosConfig';
-
 
 
 const EditProfile = () => {
@@ -43,27 +41,29 @@ const EditProfile = () => {
         const signal = controller.signal;
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes
 
-      const response = await api.put(`/api/user-update/${id}`, {
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/user-update/${id}`, {
+        method: 'PUT',
         body: formData,
         signal: signal
       });
 
       clearTimeout(timeoutId);
 
-      if (response.status === 200) {
-        setUser(response.data);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
+        setError(data.message || 'Error updating user profile');
         setIsLoading(false);
-        navigate(`/profile/${id}`)
-        return
+        return;
       }
 
-      if (response.data.message == 'Token expired, please login') {
-        logout();
-        navigate('/login')
-      }
-      setError(response.data.message || 'Error updating user profile');
+      setUser(data);
       setIsLoading(false);
-      return;
+      navigate(`/profile/${id}`)
     } catch (error) {
         if (error.name === 'AbortError') {
           setError('Request timed out');

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
-import api from '../config/axiosConfig';
-import Navbar from './Navbar';
+import { baseUrl } from '../config/BaseUrl';
 
 const Login = () => {
   const [access, setAccess] = useState('');
@@ -19,33 +19,44 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await api.post('/api/user/login', { access, password });
+        const response = await fetch(`${baseUrl}/api/user/login`, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ access, password }),
+        });
 
-      if (response.status === 200) {
-        const { token } = response.data;
-        login(token);
-        setCookie('token', token, { path: '/', maxAge: 60 });
-        setIsLoading(false);
-        setAccess('');
-        setPassword('');
-        navigate('/');
-      } else {
-        setIsLoading(false);
-        setError(response.data.message);
-        console.error('Error logging user in');
-      }
+        const data = await response.json();
+        if (response.ok) {
+            const token = data.token;
+            // const refreshToken = cookies?.jwt
+            // localStorage.setItem('refreshToken', refreshToken)
+      
+            login(token)
+            setCookie('token', token, { path: '/', maxAge: 60 });
+            setIsLoading(false);
+            setAccess('');
+            setPassword('');
+            navigate('/');
+        } else {
+            setIsLoading(false);
+            setError(data.message);
+            console.error('Error loggin user in');
+        }
     } catch (error) {
-      setIsLoading(false);
-      setError('Error logging in. Please try again.');
-      console.error('Error logging in:', error);
+        setIsLoading(false);
+        setError('Error logging in. Please try again.');
+        console.error('Error logging in:', error);
     }
-  };
+  }
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate('/');
+        navigate('/');
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn])
 
 
   return (

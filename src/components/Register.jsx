@@ -3,8 +3,6 @@ import Navbar from './Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import { baseUrl } from '../config/BaseUrl';
-import api from '../config/axiosConfig';
-// import { fetchWithTokenRefresh } from '../utils/refreshToken';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -20,13 +18,21 @@ const Register = () => {
     setError('');
 
     try {
-      const response = await api.post(`${baseUrl}/api/user/register`, { username, email, password });
+      const response = await fetch(`${baseUrl}/api/user/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-      if (response.status === 201) {
-        console.log(response.data)
-        navigate('/alert-page', { state: { registrationSuccess: response.data.message } });
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(data)
+        navigate('/alert-page', { state: { registrationSuccess: data.message } });
       } else {
-        setError(response.data.message);
+        setError(data.message);
       }
     } catch (error) {
       setError('An error occurred. Please try again.');

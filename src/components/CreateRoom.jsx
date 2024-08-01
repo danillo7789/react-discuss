@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
 import { useAuth } from '../authContext/context';
-import api from '../config/axiosConfig';
 
 
 const CreateRoom = () => {
@@ -19,21 +18,22 @@ const CreateRoom = () => {
 
   const fetchTopics = async () => {
     try {
-      const response = await api.get('/api/get/topic-feed');
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
+        method: 'GET',s
+      });
 
-      if (response.status === 200) {
-        setTopics(response.data.topicsObject);
-        return
-      }
+      const data = await response.json();
 
-      if (response.data.message == 'Token expired, please login') {
-        logout();
-        navigate('/login')
-      } else {
-        setError(response.data.message || 'Failed to fetch topics');
+      if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
+        setError(data.message || 'Failed to fetch topics');
         return;
       }
-    
+      
+      setTopics(data.topicsObject);
     } catch (error) {
       setError('An error occurred while fetching topics');
       console.error('Error fetching topics:', error);
@@ -50,22 +50,27 @@ const CreateRoom = () => {
     setError('');
 
     try {
-      const response = await api.post('/api/create-room', { name, topic, description });
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/create-room`, {
+        method: 'POST',
+        body: JSON.stringify({ name, topic, description })
+      });
 
-      if (response.status === 201) {  
-        setName('');
-        setTopic('');
-        setDescription('');
-        setIsLoading(false)
-        navigate(`/room/${data._id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        }
+        setError(data.message || 'Error creating room');
+        return;
       }
 
-      if (data.message == 'Token expired, please login') {
-        logout();
-        navigate('/login')
-      }
-      setError(data.message || 'Error creating room');
-      return;
+      setName('');
+      setTopic('');
+      setDescription('');
+      setIsLoading(false)
+      navigate(`/room/${data._id}`);
     } catch (error) {
       setError('An error occurred while creating room');
       console.error('Error creating room:', error);

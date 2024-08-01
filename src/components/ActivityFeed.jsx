@@ -4,7 +4,6 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import BackLink from './BackLink';
-import api from '../config/axiosConfig';
 
 const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterActivity }) => {
   const [error, setError] = useState('');
@@ -20,21 +19,25 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterA
     setIsLoading(true)
 
     try {
-      const response = await api.get('/api/get/chats');
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
+        method: 'GET',
+      });
 
-      if (response.status === 200) {
-        setActivities(response.data);
-        setIsLoading(false)
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout();
+          navigate('/login')
+        } else {
+            setIsLoading(false);
+            setError(data.message || 'Failed to fetch rooms');
+            return;
+        }
       }
 
-      if (response.data.message == 'Token expired, please login') {
-        logout();
-        navigate('/login')
-      } else {
-          setIsLoading(false);
-          setError(response.data.message || 'Failed to fetch rooms');
-          return;
-      }
+      setActivities(data);
+      setIsLoading(false)
     } catch (error) {
       setError('An error occurred while fetching chats');
       console.error('Error fetching chats:', error);

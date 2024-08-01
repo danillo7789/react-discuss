@@ -2,7 +2,6 @@ import { useEffect, useState, memo, useCallback } from "react";
 import { baseUrl } from "../config/BaseUrl";
 import { useAuth } from "../authContext/context";
 import { useNavigate } from "react-router-dom";
-import api from "../config/axiosConfig";
 
 const TopicFeed = () => {
   const [error, setError] = useState('');
@@ -25,22 +24,26 @@ const TopicFeed = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.get('/api/get/topic-feed');
+      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
+        method: 'GET',
+      });
 
-      if (response.status === 200) {
-        setIsLoading(false);
-        setTopics(response.data.topicsObject);
-        setTopicCount(response.data.uniqueTopicsCount);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message == 'Token expired, please login') {
+          logout()
+          navigate('/login')
+        } else {
+          setIsLoading(false);
+          setError(data.message || 'Failed to fetch topics');
+          return;
+        }
       }
 
-      if (response.data.message == 'Token expired, please login') {
-        logout()
-        navigate('/login')
-      } else {
-        setIsLoading(false);
-        setError(response.data.message || 'Failed to fetch topics');
-        return;
-      }
+      setIsLoading(false);
+      setTopics(data.topicsObject);
+      setTopicCount(data.uniqueTopicsCount);
     } catch (error) {
       setIsLoading(false);
       setError('An error occurred while fetching topics');
