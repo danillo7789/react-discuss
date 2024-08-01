@@ -6,6 +6,7 @@ import RoomFeed from './RoomFeed';
 import ActivityFeed from './ActivityFeed';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import '../App.css'
+import api from '../config/axiosConfig';
 
 const Profile = () => {
   const [user, setUser] = useState({});
@@ -22,27 +23,20 @@ const Profile = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/user/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await api.get(`/api/get/user/${id}`);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
-            logout();
-            navigate('/login')
-        }
-        setError(data.message || 'Error fetching user');
+      if (response.status === 200) {
+        setUser(response.data);
         setIsLoading(false);
-        return;
       }
 
-      setUser(data);
+      if (response.data.message == 'Token expired, please login') {
+        logout();
+        navigate('/login')
+      }
+      setError(response.data.message || 'Error fetching user');
       setIsLoading(false);
+      return;
     } catch (error) {
       console.error('An error occurred while fetching user:', error);
       setError('An error occurred while fetching user');

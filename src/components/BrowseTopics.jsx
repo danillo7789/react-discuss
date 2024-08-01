@@ -5,6 +5,7 @@ import BackLink from "./BackLink";
 import { baseUrl } from "../config/BaseUrl";
 import RoomFeed from "./RoomFeed";
 import { useNavigate } from "react-router-dom";
+import api from "../config/axiosConfig";
 
 
 const BrowseTopics = () => {
@@ -33,29 +34,23 @@ const BrowseTopics = () => {
         setIsLoading(true);      
     
         try {
-          const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+          const response = await api.get('/api/get/topic-feed');
     
-          const data = await response.json();
-    
-          if (!response.ok) {
-            if (data.message == 'Token expired, please login') {
-              logout()
-              navigate('/login')
-            } else {
-              setIsLoading(false);
-              setError(data.message || 'Failed to fetch topics');
-              return;
-            }
+          if (response.status === 200) {                
+            setIsLoading(false);
+            setTopics(response.data.topicsObject);
+            setTopicCount(response.data.uniqueTopicsCount);
+            return
           }
-    
-          setIsLoading(false);
-          setTopics(data.topicsObject);
-          setTopicCount(data.uniqueTopicsCount);
+
+          if (response.data.message == 'Token expired, please login') {
+            logout()
+            navigate('/login')
+          } else {
+            setIsLoading(false);
+            setError(response.data.message || 'Failed to fetch topics');
+            return;
+          }
         } catch (error) {
           setIsLoading(false);
           setError('An error occurred while fetching topics');

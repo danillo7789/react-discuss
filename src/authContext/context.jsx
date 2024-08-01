@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { decodeToken } from '../utils/decodeToken'; 
 import { baseUrl } from '../config/BaseUrl';
 import { useCookies } from 'react-cookie';
+import api from '../config/axiosConfig';
 
 // Create the context
 const AuthContext = createContext(undefined);
@@ -16,51 +17,27 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState('');
   const [cookies, setCookie, removeCookie] = useCookies(['token', 'jwt']);
 
-  const fetchWithTokenRefresh = async (url, options = {}) => {
-    try {
-      let response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include',
-      });
-  
-      if (response.status === 401) {
-        // Trigger refresh token flow
-        const refreshResponse = await fetch(`${baseUrl}/api/user/refresh`, {
-          method: 'GET',
-          credentials: 'include',
+  const refreshToken = async () => {
+    const refreshToken = cookies?.jwt;
+    if (refreshToken) {
+      try {
+        const response = await api.get('/api/user/refresh', {
+          headers: { 'Authorization': `Bearer ${refreshToken}` },
         });
-  
-        if (refreshResponse.ok) {
-          const data = await refreshResponse.json();
-          const newToken = data.token;
-          setToken(newToken);
-          setCookie('token', newToken, { path: '/', maxAge: 600 }); // Update token in cookies
-  
-          // Retry the original request with the new token
-          response = await fetch(url, {
-            ...options,
-            headers: {
-              ...options.headers,
-              'Authorization': `Bearer ${newToken}`,
-            },
-            credentials: 'include',
-          });
-        } else {
-          throw new Error('Unable to refresh token');
-        }
+        const { token: newToken } = response.data;
+        setToken(newToken);
+        setCookie('token', newToken, { path: '/', maxAge: 600 });
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        return newToken;
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+        logout(); // Optionally logout if refresh fails
+        throw error;
       }
-  
-      return response;
-    } catch (error) {
-      console.error('Error in fetchWithTokenRefresh:', error);
-      throw error;
+    } else {
+      throw new Error('No refresh token available');
     }
   };
-  
 
   const fetchTokenFromCookies = async () => {
     try {
@@ -71,33 +48,10 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser(decoded.user);
           setIsLoggedIn(true);
           setToken(storedToken);
+          api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         }
       } else {
-        // Try to refresh the token if it exists
-        const refreshToken = cookies?.jwt;
-        if (refreshToken) {
-          const response = await fetch(`${baseUrl}/api/user/refresh`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${refreshToken}`
-            },
-            credentials: 'include',
-          });
-
-          const data = await response.json();
-          if (response.ok) {
-            setCookie('token', data.token, { path: '/', maxAge: 600 });
-            const decoded = decodeToken(data.token);
-            if (decoded) {
-              setCurrentUser(decoded.user);
-              setIsLoggedIn(true);
-              setToken(data.token);
-            }
-          } else {
-            console.error('Error fetching token from cookies:', data.message);
-          }
-        }
+        await refreshToken();
       }
     } catch (error) {
       console.error('Error fetching token from cookies:', error);
@@ -116,7 +70,8 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(decoded.user);
       setIsLoggedIn(true);
       setToken(token);
-      setCookie('token', token, { path: '/', maxAge: 600 });
+      setCookie('token', token, { path: '/', maxAge: 60 });
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   };
 
@@ -149,10 +104,10 @@ export const AuthProvider = ({ children }) => {
       setSearchQuery,
       topicFilter,
       setTopicFilter,
-      setCurrentUser, // Exposing these to allow setting in login
+      setCurrentUser,
       setIsLoggedIn,
-      fetchWithTokenRefresh,
       setCookie,
+      refreshToken,
     }}>
       {children}
     </AuthContext.Provider>

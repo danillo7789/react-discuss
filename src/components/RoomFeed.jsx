@@ -5,6 +5,7 @@ import RoomCard from "./RoomCard";
 import '../App.css'
 import ActivityFeed from "./ActivityFeed";
 import { baseUrl } from "../config/BaseUrl";
+import api from "../config/axiosConfig";
 // import { fetchWithTokenRefresh } from "../utils/refreshToken";
 
 const RoomFeed = ({ filterFunction }) => {
@@ -26,36 +27,24 @@ const RoomFeed = ({ filterFunction }) => {
   const getRooms = async () => {
     setError('');
     setIsLoading(true);
-    // const token = localStorage.getItem('token');
-    
-    // if (!token) {
-    //   setError('No token found');
-    //   setIsLoading(false);
-    //   return;
-    // }
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room-feed`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await api.get('/api/get/room-feed');
 
-      const data = await response.json();
 
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
-            logout();
-            navigate('/login')
-        }
+      if (response.status === 200) {
         setIsLoading(false);
-        setError(data.message || 'Failed to fetch rooms');
-        return;
+        setRooms(response.data);
+        return
       }
-      
+
+      if (response.data.message == 'Token expired, please login') {
+        logout();
+        navigate('/login')
+      }
       setIsLoading(false);
-      setRooms(data);
+      setError(response.data.message || 'Failed to fetch rooms');
+      return;
     } catch (error) {
         setIsLoading(false);
         setError('An error occurred while fetching rooms');

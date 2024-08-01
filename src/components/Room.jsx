@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import BackLink from './BackLink';
 import moment from 'moment';
 import Chat from './Chat';
+import api from '../config/axiosConfig';
 
 const Room = () => {
   const [room, setRoom] = useState({});
@@ -27,27 +28,20 @@ const Room = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await api.get(`/api/get/room/${id}`);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
-          logout();
-          navigate('/login')
-        }
-        setError(data.message || 'Failed to fetch room');
+      if (response.status === 200) {
+        setRoom(response.data);
         setIsLoading(false);
-        return;
+        return
       }
-      
-      setRoom(data);
+      if (response.data.message == 'Token expired, please login' || response.data.message == 'No token found') {
+        logout();
+        navigate('/login')
+      }
+      setError(response.data.message || 'Failed to fetch room');
       setIsLoading(false);
+      return;
     } catch (error) {
       setError('An error occurred while fetching room');
       setIsLoading(false);
@@ -74,22 +68,14 @@ const Room = () => {
     setMessage('');
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/post-chat/${id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message }),
-      });
+      const response = await api.post(`/api/post-chat/${id}`, {message });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+      if (response.status !== 201) {
+        if (response.data.message == 'Token expired, please login' || response.data.message == 'No token found') {
           logout();
           navigate('/login')
         }
-        setError(data.message || 'Error sending message');
+        setError(response.data.message || 'Error sending message');
         setIsLoading(false);
         return;
       }
@@ -120,31 +106,24 @@ const Room = () => {
 
   const getChats = async () => {
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats/${id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await api.get(`/api/get/chats/${id}`);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+      if (response.status !== 200) {
+        if (response.data.message == 'Token expired, please login' || response.data.message == 'No token found') {
           logout();
           navigate('/login')
         }
-        setError(data.message || 'Failed to fetch chats');
+        setError(response.data.message || 'Failed to fetch chats');
         return;
       }
       
       setRoom(prevRoom => ({
         ...prevRoom,
-        chats: data.chats, // also updating chats
-        participants: data.updatedRoom.participants //also updating participants
+        chats: response.data.chats, // also updating chats
+        participants: response.data.updatedRoom.participants //also updating participants
       }));
 
-      setChats(data.chats)
+      setChats(response.data.chats)
     } catch (error) {
       setError('An error occurred while fetching chats');
       console.error('An error occurred while fetching chats', error);
@@ -154,7 +133,7 @@ const Room = () => {
   const deleteChat = async (chatId) => {
     setChatDeleted(true)
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-chat/${chatId}`, {
+      const response = await api(`${baseUrl}/api/delete-chat/${chatId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
