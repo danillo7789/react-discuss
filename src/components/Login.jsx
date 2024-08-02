@@ -31,11 +31,9 @@ const Login = () => {
         const data = await response.json();
         if (response.ok) {
             const token = data.token;
-            // const refreshToken = cookies?.jwt
-            // localStorage.setItem('refreshToken', refreshToken)
       
             login(token)
-            setCookie('token', token, { path: '/', maxAge: 60 });
+            setCookie('token', token, { path: '/', maxAge: 900 });
             setIsLoading(false);
             setAccess('');
             setPassword('');

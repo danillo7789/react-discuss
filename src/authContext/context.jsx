@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState('');
   const [token, setToken] = useState('');
-  // const refreshToken = localStorage.getItem('refreshToken');
   
   const [cookies, setCookie, removeCookie] = useCookies(['token', 'jwt']);
 
@@ -30,8 +29,6 @@ export const AuthProvider = ({ children }) => {
       });
   
       if (response.status === 401) {
-        // setCookie('jwt', refreshToken, { path: '/', maxAge: 60 });
-        // const jwtCookie = cookies?.jwt;
         const refreshResponse = await fetch(`${baseUrl}/api/user/refresh`, {
           method: 'GET',
           headers: {
@@ -44,7 +41,7 @@ export const AuthProvider = ({ children }) => {
           const data = await refreshResponse.json();
           const newToken = data.token;
           setToken(newToken);
-          setCookie('token', newToken, { path: '/', maxAge: 60 });
+          setCookie('token', newToken, { path: '/', maxAge: 900 });
   
           // Retry the original request with the new token
           response = await fetch(url, {
@@ -79,10 +76,6 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
         }
       } else {
-        // Try to refresh the token if it exists
-        // setCookie('jwt', refreshToken, { path: '/', maxAge: 60 });
-        // const jwtCookie = cookies?.jwt;
-        // console.log('jwtCookie', jwtCookie)
         
           const response = await fetch(`${baseUrl}/api/user/refresh`, {
             method: 'GET',
@@ -93,11 +86,9 @@ export const AuthProvider = ({ children }) => {
           });
 
           const data = await response.json();
-          // const newRefresh = cookies?.jwt
-          // localStorage.setItem('refreshToken', newRefresh)
 
           if (response.ok) {
-            setCookie('token', data.token, { path: '/', maxAge: 60 });
+            setCookie('token', data.token, { path: '/', maxAge: 900 });
             const decoded = decodeToken(data.token);
             if (decoded) {
               setCurrentUser(decoded.user);
@@ -126,7 +117,7 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(decoded.user);
       setIsLoggedIn(true);
       setToken(token);
-      setCookie('token', token, { path: '/', maxAge: 60 });
+      setCookie('token', token, { path: '/', maxAge: 900 });
     }
   };
 
@@ -159,7 +150,7 @@ export const AuthProvider = ({ children }) => {
       setSearchQuery,
       topicFilter,
       setTopicFilter,
-      setCurrentUser, // Exposing these to allow setting in login
+      setCurrentUser,
       setIsLoggedIn,
       fetchWithTokenRefresh,
       setCookie,
