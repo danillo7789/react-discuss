@@ -29,51 +29,46 @@ const EditProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('')
+    setError('');
     setIsLoading(true);
-
+  
     const formData = new FormData();
     formData.append('email', email);
     formData.append('profilePicture', profilePicture);
-
+  
     try {
-        const controller = new AbortController();
-        const signal = controller.signal;
-        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes
-
+  
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/user-update/${id}`, {
         method: 'PUT',
         body: formData,
-        signal: signal
       });
-
-      clearTimeout(timeoutId);
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
+        if (data.message === 'Token expired, please login') {
           logout();
-          navigate('/login')
+          navigate('/login');
         }
         setError(data.message || 'Error updating user profile');
         setIsLoading(false);
         return;
       }
-
+  
       setUser(data);
       setIsLoading(false);
-      navigate(`/profile/${id}`)
+      navigate(`/profile/${id}`);
     } catch (error) {
-        if (error.name === 'AbortError') {
-          setError('Request timed out');
-        } else {
-          setError('Error updating user profile');
-        }
-        console.error('Error updating user profile', error);
-        setIsLoading(false);
+      if (error.name === 'AbortError') {
+        setError('Request timed out');
+      } else {
+        setError('Error updating user profile');
+      }
+      console.error('Error updating user profile', error);
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div>

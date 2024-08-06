@@ -10,10 +10,12 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { isLoggedIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
+    setIsLoading(true)
     e.preventDefault();
     setError('');
 
@@ -29,7 +31,7 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data)
+        setIsLoading(false)
         navigate('/alert-page', { state: { registrationSuccess: data.message } });
       } else {
         setError(data.message);
@@ -86,7 +88,9 @@ const Register = () => {
                                 required
                             />
                         </div>
-                        <button className='btn btns' type="submit">Register</button>
+                        <button className='btn btns' type="submit" disabled={isLoading}>
+                          {isLoading ? 'Registering...' : 'Register'}
+                        </button>
                     </form>
                     <p className='d-flex'>Already have an account? <Link className='nav-link nav-text px-2 text-info' to='/login'>Login</Link></p>
                 </div>

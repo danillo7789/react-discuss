@@ -19,10 +19,20 @@ export const AuthProvider = ({ children }) => {
 
   const fetchWithTokenRefresh = async (url, options = {}) => {
     try {
+      const headers = { ...options.headers };
+  
+      // Check if the body is FormData and remove the 'Content-Type' header if it is
+      if (options.body instanceof FormData) {
+        delete headers['Content-Type'];
+      } else {
+        headers['Content-Type'] = 'application/json';
+      }
+  
+      console.log('headers', headers);
       let response = await fetch(url, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          ...headers,
           'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
@@ -47,7 +57,7 @@ export const AuthProvider = ({ children }) => {
           response = await fetch(url, {
             ...options,
             headers: {
-              'Content-Type': 'application/json',
+              ...headers,
               'Authorization': `Bearer ${newToken}`,
             },
             credentials: 'include',
@@ -63,6 +73,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+  
   
 
   const fetchTokenFromCookies = async () => {

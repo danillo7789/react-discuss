@@ -133,7 +133,9 @@ const CreateRoom = () => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
                         </div>
-                        <button className='btn btns' type="submit">{isLoading ? 'Creating...' : 'Create Room'}</button>
+                        <button className='btn btns' type="submit" disabled={isLoading}>
+                          {isLoading ? 'Creating...' : 'Create Room'}
+                        </button>
                     </form>
                 </div>
             </div>

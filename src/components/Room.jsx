@@ -1,4 +1,4 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useCallback, useRef } from 'react';
 import { baseUrl } from '../config/BaseUrl';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
@@ -6,6 +6,10 @@ import Navbar from './Navbar';
 import BackLink from './BackLink';
 import moment from 'moment';
 import Chat from './Chat';
+import io from 'socket.io-client';
+import uuid from 'react-uuid';
+
+const socket = io(baseUrl);
 
 const Room = () => {
   const [room, setRoom] = useState({});
@@ -13,17 +17,17 @@ const Room = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
-  const { isLoggedIn, currentUser, fetchWithTokenRefresh } = useAuth();
+  const { isLoggedIn, currentUser, fetchWithTokenRefresh, logout } = useAuth();
   const [message, setMessage] = useState('');
   const [chatPosted, setChatPosted] = useState(false);
   const [chatDeleted, setChatDeleted] = useState(false);
   const navigate = useNavigate();
   const blank_img = import.meta.env.VITE_BLANK_IMG;
   const [showActivity, setShowActivity] = useState(false);
+  const chatContainerRef = useRef(null); // Create a ref for the chat container
 
-  // console.log('room rendered');
 
-  const getRoom = async () => {
+  const getRoom = useCallback(async () => {
     setIsLoading(true);
 
     try {
@@ -34,9 +38,9 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
           logout();
-          navigate('/login')
+          navigate('/login');
         }
         setError(data.message || 'Failed to fetch room');
         setIsLoading(false);
@@ -44,30 +48,35 @@ const Room = () => {
       }
       
       setRoom(data);
+      // setChats(data.chats || []);
       setIsLoading(false);
     } catch (error) {
       setError('An error occurred while fetching room');
       setIsLoading(false);
       console.error('An error occurred while fetching room', error);
     }
-  };
+  }, [id]);
 
   const postChat = async (e) => {
     e.preventDefault();
   
-    const tempId = Date.now(); // Generating a temporary ID for the new chat
-    const newChat = {
-      _id: tempId,
-      sender: { username: currentUser?.username }, 
-      text: message,
-      createdAt: new Date().toISOString(),
-    };
+    const tempId = Date.now();
+    // const newChat = {
+    //   _id: tempId,
+    //   sender: {
+    //     _id: currentUser?.id,
+    //     username: currentUser?.username,
+    //     profilePicture: currentUser?.profilePicture,
+    //   }, 
+    //   text: message,
+    //   createdAt: new Date().toISOString(),
+    // };
 
     // updating the state instantly
-    setRoom(prevRoom => ({
-      ...prevRoom,
-      chats: [...prevRoom.chats, newChat],
-    }));
+    // setRoom(prevRoom => ({
+    //   ...prevRoom,
+    //   chats: [...prevRoom.chats, newChat],
+    // }));
     setMessage('');
 
     try {
@@ -79,40 +88,39 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
           logout();
-          navigate('/login')
+          navigate('/login');
         }
         setError(data.message || 'Error sending message');
         setIsLoading(false);
         return;
       }
 
-    // Update the chat with the actual ID from the server
-    setRoom(prevRoom => ({
-        ...prevRoom,
-        chats: prevRoom.chats.map(chat => 
-            chat._id === tempId ? data : chat
-        ),
-    }));
+      // setRoom(prevRoom => ({
+      //   ...prevRoom,
+      //   chats: prevRoom.chats.map(chat => 
+      //       chat._id === tempId ? data : chat
+      //   ),
+      // }));
 
-      setMessage(''); 
+      socket.emit('send_message', { roomId: id, ...data });
+      setMessage('');
       setChatPosted(true);
       setIsLoading(false);
     } catch (error) {
       setError('An error occurred while sending message');
       console.error('Error sending message', error);
 
-        // Revert the optimistic update
-        setRoom(prevRoom => ({
-            ...prevRoom,
-            chats: prevRoom.chats.filter(chat => chat._id !== tempId),
-        }));
-        setIsLoading(false);
+      setRoom(prevRoom => ({
+        ...prevRoom,
+        chats: prevRoom.chats.map(chat => chat._id !== tempId)
+      }));
+      setIsLoading(false);
     }
   };
 
-  const getChats = async () => {
+  const getChats = useCallback(async () => {
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats/${id}`, {
         method: 'GET',
@@ -121,9 +129,9 @@ const Room = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message == 'Token expired, please login' || data.message == 'No token found') {
+        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
           logout();
-          navigate('/login')
+          navigate('/login');
         }
         setError(data.message || 'Failed to fetch chats');
         return;
@@ -131,38 +139,45 @@ const Room = () => {
       
       setRoom(prevRoom => ({
         ...prevRoom,
-        chats: data.chats, // also updating chats
-        participants: data.updatedRoom.participants //also updating participants
+        chats: data.chats,
+        participants: data.updatedRoom.participants
       }));
 
-      setChats(data.chats)
+      setChats(data.chats);
     } catch (error) {
       setError('An error occurred while fetching chats');
       console.error('An error occurred while fetching chats', error);
     }
-  };
+  }, [id, navigate]);
 
   const deleteChat = async (chatId) => {
-    setChatDeleted(true)
+    setChatDeleted(true);
     try {
       const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-chat/${chatId}`, {
         method: 'DELETE',
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         setError(data.message || 'Failed to delete chat');
         return;
       }
-
+  
+      // Update state after successful deletion
+      // setRoom(prevRoom => ({
+      //   ...prevRoom,
+      //   chats: prevRoom.chats.filter(chat => chat._id !== chatId)
+      // }));
       getChats();
+      socket.emit('delete_message', { roomId: id, chatId: data.deleted._id });
+      setChatDeleted(false);
     } catch (error) {
       setError('An error occurred while deleting chat');
       console.error('Error deleting chat', error);
     }
   };
-
+  
   const deleteRoom = async (roomId) => {
     setIsLoading(true);
     setError(''); 
@@ -195,7 +210,30 @@ const Room = () => {
 
   useEffect(() => {
     getRoom();
-  }, []);
+    socket.emit('join_room', id);
+  
+    socket.on('receive_message', (newChat) => {
+      console.log('Received message:', newChat);
+      setRoom((prevRoom) => ({
+        ...prevRoom,
+        chats: [...prevRoom.chats, newChat],
+      }));
+    });
+  
+    socket.on('delete_message', ({ chatId }) => {
+      console.log('Deleting message:', chatId);
+      setRoom((prevRoom) => ({
+        ...prevRoom,
+        chats: prevRoom.chats.filter(chat => chat._id !== chatId)
+      }));
+    });
+  
+    return () => {
+      socket.off('receive_message');
+      socket.off('delete_message');
+    };
+  }, [id, getRoom]);
+  
 
   useEffect(() => {
     if (isLoggedIn && (chatPosted || chatDeleted)) {
@@ -203,8 +241,13 @@ const Room = () => {
       setChatPosted(false);
       setChatDeleted(false);
     }
-  }, [chatPosted, isLoggedIn, chatDeleted]);
+  }, [chatPosted, isLoggedIn, chatDeleted, getChats]);
 
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [room.chats]);
 
   return (
     <div>
@@ -267,10 +310,10 @@ const Room = () => {
 
               <div className='px-4 pb-3'>
 
-                <div className='message-box p-3 rounded'>
+                <div className='message-box p-3 rounded' ref={chatContainerRef}>
                   {room?.chats?.map(chat => (
                     <Chat
-                      key={chat?._id}
+                      key={uuid()}
                       chat={chat} 
                       deleteChat={deleteChat}
                       isLoading={isLoading} />

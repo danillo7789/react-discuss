@@ -93,7 +93,9 @@ const Login = () => {
                                 required
                             />
                         </div>
-                        <button className='btn btns' type="submit">{isLoading ? 'Logging in...' : 'Login'}</button>
+                        <button className='btn btns' type="submit" disabled={isLoading}>
+                            {isLoading ? 'Logging in...' : 'Login'}
+                        </button>
                     </form>
                     <p className='d-flex'>Don't have an account? <Link className='nav-link nav-text px-2 text-info' to='/register'>Register</Link></p>
                 </div>

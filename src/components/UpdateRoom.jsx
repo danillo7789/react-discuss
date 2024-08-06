@@ -176,7 +176,9 @@ const UpdateRoom = () => {
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </div>
-                    <button className='btn btns' type="submit">{updating ? 'Updating...' : 'Update Room'}</button>
+                    <button className='btn btns' type="submit" disabled={updating}>
+                      {updating ? 'Updating...' : 'Update Room'}
+                    </button>
                 </form>
                 </div>
             </div>
