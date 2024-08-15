@@ -213,7 +213,7 @@ const Room = () => {
     socket.emit('join_room', id);
   
     socket.on('receive_message', (newChat) => {
-      console.log('Received message:', newChat);
+      // console.log('Received message:', newChat);
       setRoom((prevRoom) => ({
         ...prevRoom,
         chats: [...prevRoom.chats, newChat],
@@ -221,7 +221,7 @@ const Room = () => {
     });
   
     socket.on('delete_message', ({ chatId }) => {
-      console.log('Deleting message:', chatId);
+      // console.log('Deleting message:', chatId);
       setRoom((prevRoom) => ({
         ...prevRoom,
         chats: prevRoom.chats.filter(chat => chat._id !== chatId)

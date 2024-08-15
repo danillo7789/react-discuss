@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState('');
   const [token, setToken] = useState('');
-  
   const [cookies, setCookie, removeCookie] = useCookies(['token', 'jwt']);
 
   const fetchWithTokenRefresh = async (url, options = {}) => {
@@ -28,7 +27,6 @@ export const AuthProvider = ({ children }) => {
         headers['Content-Type'] = 'application/json';
       }
   
-      console.log('headers', headers);
       let response = await fetch(url, {
         ...options,
         headers: {

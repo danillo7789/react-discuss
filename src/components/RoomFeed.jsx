@@ -1,64 +1,67 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../authContext/context";
 import RoomCard from "./RoomCard";
 import '../App.css'
 import ActivityFeed from "./ActivityFeed";
 import { baseUrl } from "../config/BaseUrl";
-// import { fetchWithTokenRefresh } from "../utils/refreshToken";
+import { useQuery } from "@tanstack/react-query";
+
+const getRooms = async(fetchWithTokenRefresh) => {
+  const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room-feed`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch rooms');
+  }
+
+  return response.json();
+}
 
 const RoomFeed = ({ filterFunction }) => {
-  const [error, setError] = useState('');
   const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
   const { logout, isLoggedIn, searchQuery, topicFilter, setTopicFilter, fetchWithTokenRefresh } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [visibleActivity, setVisibleActivity] = useState(false)
   const { id } = useParams()
   const location = useLocation();
   const currentPath = location.pathname;
+  const prevRoomsLengthRef = useRef(rooms.length)
   
 
   const handleActivity = () => {
     setVisibleActivity(!visibleActivity)
   }
 
-  const getRooms = async () => {
-    setError('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room-feed`, {
-        method: 'GET',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
-            logout();
-            navigate('/login')
-        }
-        setIsLoading(false);
-        setError(data.message || 'Failed to fetch rooms');
-        return;
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ['rooms'],
+    queryFn: () => getRooms(fetchWithTokenRefresh),
+    enabled: isLoggedIn, 
+    staleTime: 1000 * 60 * 15, 
+    retry: 1, 
+    onError: (err) => {
+      if (err.message === 'Token expired, please login') {
+        logout();
+        navigate('/login');
+      } else {
+        console.error('Error fetching rooms:', err);
       }
-      
-      setIsLoading(false);
-      setRooms(data);
-    } catch (error) {
-        setIsLoading(false);
-        setError('An error occurred while fetching rooms');
-        console.error('Error fetching rooms:', error);
     }
-  };
-
+  });
 
   useEffect(() => {
-    if (isLoggedIn) {
-        getRooms();
+    if (data) {
+      setRooms(data);
     }
-  }, [isLoggedIn]);
+  }, [data]);
+
+  useEffect(() => {
+    if (rooms.length !== prevRoomsLengthRef.current) {
+      refetch();
+      prevRoomsLengthRef.current = rooms.length;
+    }
+  }, [rooms]);
 
 //   const filteredRooms = filterFunction ? rooms?.filter(filterFunction) : rooms;
 
@@ -67,20 +70,20 @@ const RoomFeed = ({ filterFunction }) => {
     .filter(room => searchQuery ? room?.name?.toLowerCase().includes(searchQuery?.toLowerCase()) : true)
     .filter(room => topicFilter ? room?.topic?.name?.toLowerCase() === topicFilter.toLowerCase() : true);
 
-    const filterActivitiesByHost = (activity) => activity?.room?.host?._id === id || activity
+  const filterActivitiesByHost = (activity) => activity?.room?.host?._id === id || activity
 
-    const handleTopic = () => {
-        if (currentPath === '/topics') {
-            window.location.reload()
-        }
-    }
+  const handleTopic = () => {
+      if (currentPath === '/topics') {
+          window.location.reload()
+      }
+  }
 
 
   return (
     <div>
       {error && 
         <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
-            {error}
+            {error.message}
             <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         }

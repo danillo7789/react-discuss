@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './authContext/context.jsx';
 import ErrorPage from './components/ErrorPage.jsx'
 import Login from './components/Login.jsx'
@@ -86,8 +87,13 @@ const router = createBrowserRouter([
   // },
 ]);
 
+// Create a QueryClient instance
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
+  <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <RouterProvider router={router} />
-    </AuthProvider>,
-)
+    </AuthProvider>
+  </QueryClientProvider>
+);

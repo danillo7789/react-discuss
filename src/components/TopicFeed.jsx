@@ -1,61 +1,65 @@
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, useRef, } from "react";
 import { baseUrl } from "../config/BaseUrl";
 import { useAuth } from "../authContext/context";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchTopics = async (fetchWithTokenRefresh) => {
+  const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch topics');
+  }
+
+  return response.json();
+};
 
 const TopicFeed = () => {
-  const [error, setError] = useState('');
   const [topics, setTopics] = useState([]);
   const [topicCount, setTopicCount] = useState('');
   const { isLoggedIn, logout, setTopicFilter, fetchWithTokenRefresh } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const prevTopicsLengthRef = useRef(topics.length)
 
   const handleSearchInput = () => {
     setShowSearch(!showSearch);
   }
 
-  // console.log('topic feed rendered');
-
-  const getTopicDetails = useCallback(async () => {
-    setError('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/topic-feed`, {
-        method: 'GET',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
-          logout()
-          navigate('/login')
-        } else {
-          setIsLoading(false);
-          setError(data.message || 'Failed to fetch topics');
-          return;
-        }
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ['topics'],            // Query key
+    queryFn: () => fetchTopics(fetchWithTokenRefresh), // Query function
+    enabled: isLoggedIn,             // Options
+    retry: 1,
+    staleTime: 1000 * 60 * 15,
+    onError: (err) => {
+      if (err.message === 'Token expired, please login') {
+        logout();
+        navigate('/login');
+      } else {
+        console.error('An error occured while fetching topics', err);
       }
-
-      setIsLoading(false);
+    }
+  });
+  
+  useEffect(()=> {
+    if (data) {
       setTopics(data.topicsObject);
       setTopicCount(data.uniqueTopicsCount);
-    } catch (error) {
-      setIsLoading(false);
-      setError('An error occurred while fetching topics');
-      console.error('Error fetching topics:', error);
     }
-  }, [topics.length])
+  }, [data])
 
-  useEffect(() => {
-    if (isLoggedIn){
-      getTopicDetails();
+  useEffect(()=> {
+    if (topics.length !== prevTopicsLengthRef.current) {
+      refetch()
+      prevTopicsLengthRef.current = topics.length
     }
-  }, [isLoggedIn, topics.length]);
+  }, [topics])
+
+
 
   if (isLoading) {
     return (
@@ -75,7 +79,7 @@ const TopicFeed = () => {
     <div className="px-2">
       {error && 
         <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
-            {error}
+            {error.message}
             <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>}
       <h5 className="">Browse Topics</h5>

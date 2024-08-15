@@ -1,53 +1,58 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { baseUrl } from '../config/BaseUrl';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import BackLink from './BackLink';
+import { useQuery } from '@tanstack/react-query';
+
+const getAllChats = async (fetchWithTokenRefresh) => {
+  const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch activites')
+  }
+
+  return response.json();
+}
 
 const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterActivity }) => {
-  const [error, setError] = useState('');
   const [activities, setActivities] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const blank_img = import.meta.env.VITE_BLANK_IMG;
-  const { searchQuery, topicFilter, fetchWithTokenRefresh } = useAuth();
+  const { searchQuery, topicFilter, fetchWithTokenRefresh, isLoggedIn } = useAuth();
+  const prevActivitesLengthRef = useRef(activities.length);
   
-  // console.log('activity feed rendered');
-
-  const getAllChats = async () => {
-    setError('')
-    setIsLoading(true)
-
-    try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
-        method: 'GET',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message == 'Token expired, please login') {
-          logout();
-          navigate('/login')
-        } else {
-            setIsLoading(false);
-            setError(data.message || 'Failed to fetch rooms');
-            return;
-        }
+  
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ['activites-chats'],
+    queryFn: () => getAllChats(fetchWithTokenRefresh),
+    enabled: isLoggedIn, 
+    staleTime: 1000 * 60 * 15, 
+    retry: 1, 
+    onError: (err) => {
+      if (err.message === 'Token expired, please login') {
+        logout();
+        navigate('/login');
+      } else {
+        console.error('Error fetching activites:', err);
       }
-
-      setActivities(data);
-      setIsLoading(false)
-    } catch (error) {
-      setError('An error occurred while fetching chats');
-      console.error('Error fetching chats:', error);
-      setIsLoading(false);
     }
-  };
-    
+  });
+
   useEffect(() => {
-    getAllChats();
-  }, []);
+    if (data) {
+      setActivities(data)
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (activities.length !== prevActivitesLengthRef.current) {
+      refetch();
+      prevActivitesLengthRef.current = activities.length;
+    }
+  }, [activities]);
 
   // const filteredActivities = filterFunc ? activities.filter(filterFunc) : activities;
 
@@ -59,13 +64,10 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterA
 
   return (
     <div>
-      {/* <div className='activity-navbar'>
-        <Navbar />
-      </div> */}
       <div className='activity'>
           {error && 
           <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
-              {error}
+              {error.message}
               <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
           }
@@ -73,7 +75,7 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterA
             <div className='heading d-flex justify-content-between px-4 pt-2'>
               <div className='d-flex'>
                 <div className='back-link'>
-                  < BackLink visibleActivity={visibleActivity} setVisibleActivity={setVisibleActivity} />
+                  <BackLink visibleActivity={visibleActivity} setVisibleActivity={setVisibleActivity} />
                 </div>  
                 <div className='ms-5 f-sm'>RECENT ACTIVITIES</div>
               </div>
