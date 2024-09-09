@@ -281,20 +281,24 @@ const Room = () => {
               (<div className='heading px-4 pt-2'>
                   <div className='d-flex justify-content-between'>
                       <BackLink />
+                      <div className="">
+                        <p className='fw-bold'>{room?.name}</p>        
+                      </div>
                       {room && room?.host?._id === currentUser?.id && (
                           <div className='d-flex'>
                               <Link className='linkc' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
                               <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
                           </div>
-                      )}                                 
+                      )}
+                      {room && room?.host?._id !== currentUser?.id && (
+                          <div className='d-flex'>
+                                
+                          </div>
+                      )}                               
                   </div>
               </div>)}
                 
-                <div>
-                    <div className="d-flex justify-content-between px-4 py-3">
-                        <h4 className='fw-bold'>{room?.name}</h4>
-                        <div>{moment(room?.createdAt).fromNow()}</div>
-                    </div>
+                <div className='d-flex justify-content-between'>
                     <div className='px-4 pb-3'>
                         <div className='mb-1'>HOSTED BY 
                           <Link className='linkc' to={`/profile/${room?.host?._id}`}>
@@ -302,9 +306,12 @@ const Room = () => {
                           </Link>
                         </div>
                         <div className="d-flex mb-2">
-                        <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
+                          <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
                         </div>
                         <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text">{room?.topic?.name}</small>
+                    </div>
+                    <div className="d-flex px-4 py-3">                        
+                        <div>{moment(room?.createdAt).fromNow()}</div>
                     </div>
                 </div>
 

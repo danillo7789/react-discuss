@@ -174,7 +174,7 @@ body {
   color: rgb(202, 208, 237);
   overflow-y: scroll;
   /* height: 360px; */
-  height: 41vh;
+  height: 60vh;
 }
 
 .full-height {
@@ -193,22 +193,24 @@ body {
 
 /* Webkit Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 5px; /* Set the desired width */
+  /* width: 5px; Set the desired width */
+  width: 0px;
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgb(36, 36, 64); /* Color of the scrollbar thumb */
-  border-radius: 10px; /* Rounded edges of the scrollbar thumb */
-}
+/* ::-webkit-scrollbar-thumb { */
+  /* background: rgb(36, 36, 64); Color of the scrollbar thumb */
+  /* border-radius: 10px; Rounded edges of the scrollbar thumb */
+/* } */
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Color when hovering over the scrollbar thumb */
-}
+/* ::-webkit-scrollbar-thumb:hover { */
+  /* background: #555; Color when hovering over the scrollbar thumb */
+/* } */
 
-::-webkit-scrollbar-track {
-  background: rgb(101, 101, 179); /* Color of the scrollbar track */
-  border-radius: 10px; /* Rounded edges of the scrollbar track */
-}
+/* ::-webkit-scrollbar-track { */
+  /* background: rgb(101, 101, 179); Color of the scrollbar track */
+  /* border-radius: 10px; Rounded edges of the scrollbar track */
+/* } */
 
 
 .bg-heading{
@@ -257,8 +259,8 @@ body {
 }
 
 .display-pic {
-  height: 50px;
-  width: 50px;
+  height: 35px;
+  width: 35px;
 }
 
 .profile-pic {
@@ -282,6 +284,9 @@ body {
   color: rgb(176, 175, 227);
 }
 
+.chat-mssg {
+  max-width: 70%;
+}
 
 
 
@@ -391,5 +396,8 @@ body {
 
   #participants {
     display: none;
+  }
+  #chat-self {
+    font-size: smaller;
   }
 }

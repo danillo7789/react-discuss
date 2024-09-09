@@ -29,7 +29,7 @@ const ActivityFeed = ({ filterFunc, visibleActivity, setVisibleActivity, filterA
     queryKey: ['activites-chats'],
     queryFn: () => getAllChats(fetchWithTokenRefresh),
     enabled: isLoggedIn, 
-    staleTime: 1000 * 60 * 15, 
+    staleTime: 1000 * 60 * 60 * 6, 
     retry: 1, 
     onError: (err) => {
       if (err.message === 'Token expired, please login') {

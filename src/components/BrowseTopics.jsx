@@ -67,7 +67,7 @@ const BrowseTopics = () => {
     }, [isLoggedIn, topics.length]);
 
 
-    const fiveTopics = topics.slice(0, 5);
+    const fiveTopics = topics.slice(0, 10);
     
   return (
     <div>

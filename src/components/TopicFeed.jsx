@@ -34,7 +34,7 @@ const TopicFeed = () => {
     queryFn: () => fetchTopics(fetchWithTokenRefresh), // Query function
     enabled: isLoggedIn,             // Options
     retry: 1,
-    staleTime: 1000 * 60 * 15,
+    staleTime: 1000 * 60 * 60 * 6,
     onError: (err) => {
       if (err.message === 'Token expired, please login') {
         logout();
@@ -73,7 +73,7 @@ const TopicFeed = () => {
     );
   }
 
-  const fiveTopics = topics.slice(0, 5);
+  const fiveTopics = topics.slice(0, 10);
 
   return (
     <div className="px-2">
