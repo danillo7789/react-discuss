@@ -5,7 +5,6 @@ import Logout from './Logout';
 import useUser from '../hooks/useUser';
 import '../App.css'
 
-
 const Navbar = () => {
     const { isLoggedIn, searchQuery, setSearchQuery } = useAuth();
     const blank_img = import.meta.env.VITE_BLANK_IMG;
@@ -21,9 +20,7 @@ const Navbar = () => {
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value); //update the searchQuery
-    };    
-
-    
+    };
 
     return (
         <div className='sticky-top'>

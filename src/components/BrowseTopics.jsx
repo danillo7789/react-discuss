@@ -6,9 +6,7 @@ import { baseUrl } from "../config/BaseUrl";
 import RoomFeed from "./RoomFeed";
 import { useNavigate } from "react-router-dom";
 
-
 const BrowseTopics = () => {
-    // const token = localStorage.getItem('token');
     const [search, setSearch] = useState('');
     const { isLoggedIn, setTopicFilter, logout, fetchWithTokenRefresh } = useAuth();
     const [error, setError] = useState('');
