@@ -73,7 +73,7 @@ const TopicFeed = () => {
     );
   }
 
-  const fiveTopics = topics.slice(0, 10);
+  const tenTopics = topics.slice(0, 10);
 
   return (
     <div className="px-2">
@@ -104,7 +104,7 @@ const TopicFeed = () => {
       </form>) : null}
 
       {topics.length > 0 ? (
-        (search === '' ? fiveTopics : topics)
+        (search === '' ? tenTopics : topics)
         .filter(topic => search === '' ? true : topic?.topic?.toLowerCase().includes(search.toLowerCase()))
         .map((topic) => (
             <div className="d-flex justify-content-between pointer" key={topic?.topic} onClick={() => setTopicFilter(topic?.topic)}>                                    

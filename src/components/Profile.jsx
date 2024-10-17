@@ -93,7 +93,12 @@ const Profile = () => {
                     <div className='d-flex justify-content-between'>
                         <div>
                             <div className='mb-4'><h6>Username: </h6> <div className='text-light'>{user?.username}</div></div>
-                            <div><h6>Email: </h6> <div className='text-light'>{user?.email}</div></div>
+                            <div>
+                              <h6>Email: </h6>
+                              <div className='text-light'>
+                                {currentUser?.id === id ? user?.email : '*********@mail.com'}
+                              </div>
+                            </div>
                         </div>
                         <div>
                             {currentUser?.id === id &&
