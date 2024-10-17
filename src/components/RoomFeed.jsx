@@ -38,7 +38,7 @@ const RoomFeed = ({ filterFunction }) => {
     queryKey: ['rooms'],
     queryFn: () => getRooms(fetchWithTokenRefresh),
     enabled: isLoggedIn, 
-    staleTime: 1000 * 60 * 60 * 6, 
+    staleTime: 1000 * 60 * 60 * 6, //6 hours
     retry: 1, 
     onError: (err) => {
       if (err.message === 'Token expired, please login') {
