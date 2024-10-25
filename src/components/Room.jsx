@@ -26,19 +26,24 @@ const Room = () => {
   const [showActivity, setShowActivity] = useState(false);
   const chatContainerRef = useRef(null); // Create a ref for the chat container
 
-
   const getRoom = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/room/${id}`, {
-        method: 'GET',
-      });
+      const response = await fetchWithTokenRefresh(
+        `${baseUrl}/api/get/room/${id}`,
+        {
+          method: 'GET',
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
+        if (
+          data.message === 'Token expired, please login' ||
+          data.message === 'No token found'
+        ) {
           logout();
           navigate('/login');
         }
@@ -46,7 +51,7 @@ const Room = () => {
         setIsLoading(false);
         return;
       }
-      
+
       setRoom(data);
       // setChats(data.chats || []);
       setIsLoading(false);
@@ -59,7 +64,7 @@ const Room = () => {
 
   const postChat = async (e) => {
     e.preventDefault();
-  
+
     const tempId = Date.now();
     // const newChat = {
     //   _id: tempId,
@@ -67,7 +72,7 @@ const Room = () => {
     //     _id: currentUser?.id,
     //     username: currentUser?.username,
     //     profilePicture: currentUser?.profilePicture,
-    //   }, 
+    //   },
     //   text: message,
     //   createdAt: new Date().toISOString(),
     // };
@@ -80,15 +85,21 @@ const Room = () => {
     setMessage('');
 
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/post-chat/${id}`, {
-        method: 'POST',
-        body: JSON.stringify({ message }),
-      });
+      const response = await fetchWithTokenRefresh(
+        `${baseUrl}/api/post-chat/${id}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ message }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
+        if (
+          data.message === 'Token expired, please login' ||
+          data.message === 'No token found'
+        ) {
           logout();
           navigate('/login');
         }
@@ -99,7 +110,7 @@ const Room = () => {
 
       // setRoom(prevRoom => ({
       //   ...prevRoom,
-      //   chats: prevRoom.chats.map(chat => 
+      //   chats: prevRoom.chats.map(chat =>
       //       chat._id === tempId ? data : chat
       //   ),
       // }));
@@ -112,9 +123,9 @@ const Room = () => {
       setError('An error occurred while sending message');
       console.error('Error sending message', error);
 
-      setRoom(prevRoom => ({
+      setRoom((prevRoom) => ({
         ...prevRoom,
-        chats: prevRoom.chats.map(chat => chat._id !== tempId)
+        chats: prevRoom.chats.map((chat) => chat._id !== tempId),
       }));
       setIsLoading(false);
     }
@@ -122,25 +133,31 @@ const Room = () => {
 
   const getChats = useCallback(async () => {
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats/${id}`, {
-        method: 'GET',
-      });
+      const response = await fetchWithTokenRefresh(
+        `${baseUrl}/api/get/chats/${id}`,
+        {
+          method: 'GET',
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.message === 'Token expired, please login' || data.message === 'No token found') {
+        if (
+          data.message === 'Token expired, please login' ||
+          data.message === 'No token found'
+        ) {
           logout();
           navigate('/login');
         }
         setError(data.message || 'Failed to fetch chats');
         return;
       }
-      
-      setRoom(prevRoom => ({
+
+      setRoom((prevRoom) => ({
         ...prevRoom,
         chats: data.chats,
-        participants: data.updatedRoom.participants
+        participants: data.updatedRoom.participants,
       }));
 
       setChats(data.chats);
@@ -153,17 +170,20 @@ const Room = () => {
   const deleteChat = async (chatId) => {
     setChatDeleted(true);
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-chat/${chatId}`, {
-        method: 'DELETE',
-      });
-  
+      const response = await fetchWithTokenRefresh(
+        `${baseUrl}/api/delete-chat/${chatId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         setError(data.message || 'Failed to delete chat');
         return;
       }
-  
+
       // Update state after successful deletion
       // setRoom(prevRoom => ({
       //   ...prevRoom,
@@ -177,24 +197,27 @@ const Room = () => {
       console.error('Error deleting chat', error);
     }
   };
-  
+
   const deleteRoom = async (roomId) => {
     setIsLoading(true);
-    setError(''); 
-  
+    setError('');
+
     try {
-      const response = await fetchWithTokenRefresh(`${baseUrl}/api/delete-room/${roomId}`, {
-        method: 'DELETE',
-      });
-  
+      const response = await fetchWithTokenRefresh(
+        `${baseUrl}/api/delete-room/${roomId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         setError(data.message || 'Failed to delete room');
         setIsLoading(false);
         return;
       }
-  
+
       setIsLoading(false);
       navigate('/');
     } catch (error) {
@@ -203,37 +226,55 @@ const Room = () => {
       console.error('Error deleting room:', error);
     }
   };
-  
+
   const handleActivity = () => {
     setShowActivity(!showActivity);
-  }
+  };
+
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     getRoom();
     socket.emit('join_room', id);
-  
+
     socket.on('receive_message', (newChat) => {
-      // console.log('Received message:', newChat);
+      // Update room chats
       setRoom((prevRoom) => ({
         ...prevRoom,
         chats: [...prevRoom.chats, newChat],
       }));
+
+      // Trigger notification for new chat message
+      if (Notification.permission === 'granted') {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification('New Message', {
+            body: newChat.text,
+            icon: '/path-to-your-icon.png', // Update to your icon path
+          });
+        });
+      }
     });
-  
+
     socket.on('delete_message', ({ chatId }) => {
-      // console.log('Deleting message:', chatId);
       setRoom((prevRoom) => ({
         ...prevRoom,
-        chats: prevRoom.chats.filter(chat => chat._id !== chatId)
+        chats: prevRoom.chats.filter((chat) => chat._id !== chatId),
       }));
     });
-  
+
     return () => {
       socket.off('receive_message');
       socket.off('delete_message');
     };
   }, [id, getRoom]);
-  
 
   useEffect(() => {
     if (isLoggedIn && (chatPosted || chatDeleted)) {
@@ -245,7 +286,8 @@ const Room = () => {
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [room.chats]);
 
@@ -254,140 +296,212 @@ const Room = () => {
       <Navbar />
 
       <div className='container'>
-        <div className="row pt-3">
+        <div className='row pt-3'>
           {!showActivity && (
-          <div className="col-lg-9">
-            {error && 
-              <div className="alert alert-danger text-danger alert-dismissible fade show" role="alert">
-                {error}
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            }
-
-            <div id='toggle-participants' onClick={handleActivity} className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'>
-              {showActivity ? 'Hide Participants' : 'Show Participants'}
-            </div>
-
-            <div className='bg-elements border border-0 rounded-3'> 
-              {isLoading ? (
-                <div className="container-fluid full-height d-flex justify-content-center align-items-center">
-                  <div className="text-center">
-                      <div className="spinner-border" style={{width: '3rem', height: '3rem'}} role="status">
-                          <span className="visually-hidden">Loading...</span>
-                      </div>
-                  </div>
+            <div className='col-lg-9'>
+              {error && (
+                <div
+                  className='alert alert-danger text-danger alert-dismissible fade show'
+                  role='alert'
+                >
+                  {error}
+                  <button
+                    type='button'
+                    className='btn-close'
+                    data-bs-dismiss='alert'
+                    aria-label='Close'
+                  ></button>
                 </div>
-              ): 
-              (<div className='heading px-4 pt-2'>
-                  <div className='d-flex justify-content-between'>
+              )}
+
+              <div
+                id='toggle-participants'
+                onClick={handleActivity}
+                className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'
+              >
+                {showActivity ? 'Hide Participants' : 'Show Participants'}
+              </div>
+
+              <div className='bg-elements border border-0 rounded-3'>
+                {isLoading ? (
+                  <div className='container-fluid full-height d-flex justify-content-center align-items-center'>
+                    <div className='text-center'>
+                      <div
+                        className='spinner-border'
+                        style={{ width: '3rem', height: '3rem' }}
+                        role='status'
+                      >
+                        <span className='visually-hidden'>Loading...</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className='heading px-4 pt-2'>
+                    <div className='d-flex justify-content-between'>
                       <BackLink />
-                      <div className="">
-                        <p className='fw-bold'>{room?.name}</p>        
+                      <div className=''>
+                        <p className='fw-bold'>{room?.name}</p>
                       </div>
                       {room && room?.host?._id === currentUser?.id && (
-                          <div className='d-flex'>
-                              <Link className='linkc' to={`/update-room/${room?._id}`}><div className='me-2 f-sm text-info'>Edit</div></Link>
-                              <div onClick={() => deleteRoom(room?._id)} className='text-danger f-sm pointer'>Delete</div>
+                        <div className='d-flex'>
+                          <Link
+                            className='linkc'
+                            to={`/update-room/${room?._id}`}
+                          >
+                            <div className='me-2 f-sm text-info'>
+                              <img
+                                src='https://img.icons8.com/?size=100&id=sKp0dy2A108d&format=png&color=ffffff'
+                                alt=''
+                                height={20}
+                                width={20}
+                              />
+                            </div>
+                          </Link>
+                          <div
+                            onClick={() => deleteRoom(room?._id)}
+                            className='text-danger f-sm pointer'
+                          >
+                            <img
+                              src='https://img.icons8.com/?size=100&id=43949&format=png&color=ffffff'
+                              alt=''
+                              height={20}
+                              width={20}
+                            />
                           </div>
+                        </div>
                       )}
                       {room && room?.host?._id !== currentUser?.id && (
-                          <div className='d-flex'>
-                                
-                          </div>
-                      )}                               
+                        <div className='d-flex'></div>
+                      )}
+                    </div>
                   </div>
-              </div>)}
-                
+                )}
+
                 <div className='d-flex justify-content-between'>
-                    <div className='px-4 pb-3'>
-                        <div className='mb-1'>HOSTED BY 
-                          <Link className='linkc' to={`/profile/${room?.host?._id}`}>
-                            <span className='dim mb-1'> @{room?.host?.username}</span>
-                          </Link>
-                        </div>
-                        <div className="d-flex mb-2">
-                          <img className="rounded-circle me-2 display-pic" src={room?.host?.profilePicture?.url || blank_img} alt="display picture" />
-                        </div>
-                        <small className="border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text">{room?.topic?.name}</small>
+                  <div className='px-4 pb-3'>
+                    <div className='mb-1'>
+                      HOSTED BY
+                      <Link
+                        className='linkc'
+                        to={`/profile/${room?.host?._id}`}
+                      >
+                        <span className='dim mb-1'>
+                          {' '}
+                          @{room?.host?.username}
+                        </span>
+                      </Link>
                     </div>
-                    <div className="d-flex px-4 py-3">                        
-                        <div>{moment(room?.createdAt).fromNow()}</div>
-                    </div>
-                </div>
-
-              <div className='px-4 pb-3'>
-
-                <div className='message-box p-3 rounded' ref={chatContainerRef}>
-                  {room?.chats?.map(chat => (
-                    <Chat
-                      key={uuid()}
-                      chat={chat} 
-                      deleteChat={deleteChat}
-                      isLoading={isLoading} />
-                  ))}
-                </div>
-
-                <div className='rounded bg-heading'>
-                  <form onSubmit={postChat}>
-                    <div className='d-flex'>
-                      <input
-                        type="text"
-                        placeholder='Write your message here'
-                        value={message}
-                        className='form-control chat-box py-2 border border-0 room-form-input bg-input-txt'
-                        onChange={(e) => setMessage(e.target.value)}
-                        required
+                    <div className='d-flex mb-2'>
+                      <img
+                        className='rounded-circle me-2 display-pic'
+                        src={room?.host?.profilePicture?.url || blank_img}
+                        alt='display picture'
                       />
-                      <button type="submit" className="btn btns">Send</button>
                     </div>
-                  </form>
+                    <small className='border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text'>
+                      {room?.topic?.name}
+                    </small>
+                  </div>
+                  <div className='d-flex px-4 py-3'>
+                    <div>{moment(room?.createdAt).fromNow()}</div>
+                  </div>
                 </div>
-                
+
+                <div className='px-4 pb-3'>
+                  <div
+                    className='message-box p-3 rounded'
+                    ref={chatContainerRef}
+                  >
+                    {room?.chats?.map((chat) => (
+                      <Chat
+                        key={uuid()}
+                        chat={chat}
+                        deleteChat={deleteChat}
+                        isLoading={isLoading}
+                      />
+                    ))}
+                  </div>
+
+                  <div className='rounded bg-heading'>
+                    <form onSubmit={postChat}>
+                      <div className='d-flex'>
+                        <input
+                          type='text'
+                          placeholder='Write your message here'
+                          value={message}
+                          className='form-control chat-box py-2 border border-0 room-form-input bg-input-txt'
+                          onChange={(e) => setMessage(e.target.value)}
+                          required
+                        />
+                        <button type='submit' className='btn btns'>
+                          Send
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>)}
+          )}
 
           {showActivity && (
-          <div>
-            <div onClick={handleActivity} className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'>
-              {showActivity ? 'Hide Participants' : 'Show Participants'}
-            </div>
+            <div>
+              <div
+                onClick={handleActivity}
+                className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'
+              >
+                {showActivity ? 'Hide Participants' : 'Show Participants'}
+              </div>
 
-            <div className="col-lg-3">
-              <div className='bg-elements border border-0 rounded-3'>
-                <div className='heading d-flex justify-content-between px-4 pt-2'>
-                  PARTICIPANTS <small>({room?.participants?.length} Joined)</small>
-                </div>
+              <div className='col-lg-3'>
+                <div className='bg-elements border border-0 rounded-3'>
+                  <div className='heading d-flex justify-content-between px-4 pt-2'>
+                    PARTICIPANTS{' '}
+                    <small>({room?.participants?.length} Joined)</small>
+                  </div>
 
-                <div className='px-4 py-3'>
-                  {room?.participants?.map(user => (
-                    <div key={user?._id} className="d-flex mb-2">
-                      <img className="rounded-circle me-2 display-pic" src={user?.profilePicture?.url || blank_img} alt="display picture" />
-                      <Link className='linkc' to={`/profile/${user?._id}`}><small className='dim mt-2'>@{user?.username}</small></Link>
-                    </div>
-                  ))}
+                  <div className='px-4 py-3'>
+                    {room?.participants?.map((user) => (
+                      <div key={user?._id} className='d-flex mb-2'>
+                        <img
+                          className='rounded-circle me-2 display-pic'
+                          src={user?.profilePicture?.url || blank_img}
+                          alt='display picture'
+                        />
+                        <Link className='linkc' to={`/profile/${user?._id}`}>
+                          <small className='dim mt-2'>@{user?.username}</small>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>)}
+          )}
 
-          <div id='participants' className='col-lg-3' >
+          <div id='participants' className='col-lg-3'>
             <div className='bg-elements border border-0 rounded-3'>
               <div className='heading d-flex justify-content-between px-4 pt-2'>
-                PARTICIPANTS <small>({room?.participants?.length} Joined)</small>
+                PARTICIPANTS{' '}
+                <small>({room?.participants?.length} Joined)</small>
               </div>
 
               <div className='px-4 py-3'>
-                {room?.participants?.map(user => (
-                  <div key={user?._id} className="d-flex mb-2">
-                    <img className="rounded-circle me-2 display-pic" src={user?.profilePicture?.url || blank_img} alt="display picture" />
-                    <Link className='linkc' to={`/profile/${user?._id}`}><small className='dim mt-2'>@{user?.username}</small></Link>
+                {room?.participants?.map((user) => (
+                  <div key={user?._id} className='d-flex mb-2'>
+                    <img
+                      className='rounded-circle me-2 display-pic'
+                      src={user?.profilePicture?.url || blank_img}
+                      alt='display picture'
+                    />
+                    <Link className='linkc' to={`/profile/${user?._id}`}>
+                      <small className='dim mt-2'>@{user?.username}</small>
+                    </Link>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
