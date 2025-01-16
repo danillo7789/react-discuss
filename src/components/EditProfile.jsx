@@ -1,20 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { baseUrl } from '../config/BaseUrl';
 import { useAuth } from '../authContext/context';
 import Navbar from './Navbar';
 import BackLink from './BackLink';
 import { useNavigate, useParams } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const EditProfile = () => {
+  const { user } = useUser();  
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [user, setUser] = useState({});
+  const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [preview, setPreview] = useState('');
   const { currentUser, fetchWithTokenRefresh } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      setEmail(user.email);
+    }
+  }, [user]);
+
+  if (!user) {
+    return <p>Loading...</p>;
+  }
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -56,7 +68,7 @@ const EditProfile = () => {
         return;
       }
 
-      setUser(data);
+      setUserData(data);
       setIsLoading(false);
       navigate(`/profile/${id}`);
     } catch (error) {

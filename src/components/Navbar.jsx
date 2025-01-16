@@ -88,8 +88,8 @@ const Navbar = () => {
                       alt='expand-arrow--v1'
                     />
                   </a>
-                  <ul className='dropdown-menu btns'>
-                    <li>
+                  <ul className='dropdown-menu navb-dropdown'>
+                    <li className='nav-btn'>
                       <Link
                         className='dropdown-item'
                         to={`/profile/${user?._id}`}
@@ -97,12 +97,13 @@ const Navbar = () => {
                         Profile
                       </Link>
                     </li>
-                    <li>
+                    <li className='nav-btn'>
                       <hr className='dropdown-divider' />
                     </li>
                     <Logout />
                   </ul>
                 </li>
+
               </ul>
             ) : (
               <div className='d-flex'>

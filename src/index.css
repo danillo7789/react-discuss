@@ -67,6 +67,10 @@ button:focus-visible {
   }
 } */
 
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
 body {
   background-color: rgb(48, 48, 91);
   color: rgb(176, 175, 227);
@@ -127,6 +131,23 @@ body {
 .pointer {
   cursor: pointer;
 }
+
+.navb-dropdown {
+  background-color: rgb(112, 86, 155);
+}
+
+/* Ensure the dropdown item uses the custom styles */
+.navb-dropdown .dropdown-item {
+  background-color: rgb(112, 86, 155);
+  color: rgb(202, 208, 237);
+}
+
+/* Hover state for the dropdown item */
+.navb-dropdown .dropdown-item:hover {
+  background-color: rgb(88, 63, 129); /* Deeper shade */
+  color: rgb(202, 208, 237); /* Keep the same text color */
+}
+
 
 .btns {
   background-color: rgb(112, 86, 155);
