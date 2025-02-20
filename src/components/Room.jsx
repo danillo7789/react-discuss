@@ -317,7 +317,7 @@ const Room = () => {
               <div
                 id='toggle-participants'
                 onClick={handleActivity}
-                className='linkc px-3 py-2 border border-secondary rounded-pill btn btnm mb-3'
+                className='linkc px-3 py-1 border border-secondary rounded-pill btn btnm mb-3'
               >
                 {showActivity ? 'Hide Participants' : 'Show Participants'}
               </div>
@@ -378,7 +378,7 @@ const Room = () => {
                 )}
 
                 <div className='d-flex justify-content-between'>
-                  <div className='px-4 pb-3'>
+                  <div className='px-4 py-1'>
                     <div className='mb-1'>
                       HOSTED BY
                       <Link
@@ -391,16 +391,16 @@ const Room = () => {
                         </span>
                       </Link>
                     </div>
-                    <div className='d-flex mb-2'>
+                    <div className='d-flex mb-1'>
                       <img
                         className='rounded-circle me-2 display-pic'
                         src={room?.host?.profilePicture?.url || blank_img}
                         alt='display picture'
                       />
-                    </div>
                     <small className='border border-0 bg-element-light rounded-pill px-2 py-1 text-capitalize nav-text'>
                       {room?.topic?.name}
                     </small>
+                    </div>
                   </div>
                   <div className='d-flex px-4 py-3'>
                     <div>{moment(room?.createdAt).fromNow()}</div>
@@ -429,11 +429,11 @@ const Room = () => {
                           type='text'
                           placeholder='Write your message here'
                           value={message}
-                          className='form-control chat-box py-2 border border-0 room-form-input bg-input-txt'
+                          className='form-control bg-element-light py-2 border border-0 room-form-input bg-input-txt'
                           onChange={(e) => setMessage(e.target.value)}
                           required
                         />
-                        <button type='submit' className='btn btns'>
+                        <button type='submit' className='btn btns sent-chat-bg'>
                           Send
                         </button>
                       </div>

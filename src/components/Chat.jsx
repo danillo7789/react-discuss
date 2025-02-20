@@ -16,7 +16,9 @@ const Chat = ({ chat, deleteChat, isLoading }) => {
           : 'd-flex justify-content-start'
       }
     >
-      <div className='border-start border-primary chat-mssg px-2 mb-1 bg-element-light rounded py-2'>
+      <div className={currentUser?.id === chat?.sender._id
+        ? 'border-start border-warning chat-mssg px-2 mb-1 sent-chat-bg rounded py-2'
+        : 'border-start border-primary chat-mssg px-2 mb-1 bg-element-light rounded py-2'}>
         <div>
           <div className='d-flex justify-content-between'>
             <div className='d-flex f-sm '>

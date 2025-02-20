@@ -79,7 +79,7 @@ const TopicFeed = () => {
     );
   }
 
-  const tenTopics = topics.slice(0, 10);
+  const topicLimit = topics.slice(0, 11);
 
   return (
     <div className='px-2'>
@@ -102,8 +102,8 @@ const TopicFeed = () => {
         className='d-flex justify-content-between pointer'
         onClick={() => setTopicFilter('')}
       >
-        <p className='dark fw-bold'>All</p>
-        <p className='border border-0 px-2 py-1 bg-box dark fw-bold'>
+        <p className='white fw-bold'>All</p>
+        <p className='border border-0 px-2 py-1 bg-box white fw-bold'>
           {topicCount}
         </p>
       </div>
@@ -125,7 +125,7 @@ const TopicFeed = () => {
       ) : null}
 
       {topics.length > 0 ? (
-        (search === '' ? tenTopics : topics)
+        (search === '' ? topicLimit : topics)
           .filter((topic) =>
             search === ''
               ? true

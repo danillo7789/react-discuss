@@ -13,8 +13,8 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState('');
-  const [token, setToken] = useState('');
-  const [cookies, setCookie, removeCookie] = useCookies(['token', 'jwt']);
+  // const [token, setToken] = useState('');
+  const [cookies, setCookie, removeCookie] = useCookies(['accesstoken', 'jwt']);
 
   const fetchWithTokenRefresh = async (url, options = {}) => {
     try {
@@ -30,8 +30,7 @@ export const AuthProvider = ({ children }) => {
       let response = await fetch(url, {
         ...options,
         headers: {
-          ...headers,
-          'Authorization': `Bearer ${token}`
+          ...headers,          
         },
         credentials: 'include',
       });
@@ -45,18 +44,12 @@ export const AuthProvider = ({ children }) => {
           credentials: 'include',
         });
   
-        if (refreshResponse.ok) {
-          const data = await refreshResponse.json();
-          const newToken = data.token;
-          setToken(newToken);
-          setCookie('token', newToken, { path: '/', maxAge: 900 });
-  
+        if (refreshResponse.ok) {  
           // Retry the original request with the new token
           response = await fetch(url, {
             ...options,
             headers: {
               ...headers,
-              'Authorization': `Bearer ${newToken}`,
             },
             credentials: 'include',
           });
@@ -72,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
   
-  
+
 
   const fetchTokenFromCookies = async () => {
     try {
@@ -81,8 +74,7 @@ export const AuthProvider = ({ children }) => {
         const decoded = decodeToken(storedToken);
         if (decoded) {
           setCurrentUser(decoded.user);
-          setIsLoggedIn(true);
-          setToken(storedToken);
+          setIsLoggedIn(true);          
         }
       } else {
         
@@ -96,13 +88,11 @@ export const AuthProvider = ({ children }) => {
 
           const data = await response.json();
 
-          if (response.ok) {
-            setCookie('token', data.token, { path: '/', maxAge: 900 });
+          if (response.ok) {            
             const decoded = decodeToken(data.token);
             if (decoded) {
               setCurrentUser(decoded.user);
-              setIsLoggedIn(true);
-              setToken(data.token);
+              setIsLoggedIn(true);              
             }
           } else {
             console.error('Error fetching token from cookies:', data.message);
@@ -125,8 +115,6 @@ export const AuthProvider = ({ children }) => {
     if (decoded) {
       setCurrentUser(decoded.user);
       setIsLoggedIn(true);
-      setToken(token);
-      setCookie('token', token, { path: '/', maxAge: 900 });
     }
   };
 
@@ -140,7 +128,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         setCurrentUser(null);
         setIsLoggedIn(false);
-        removeCookie('token', { path: '/' });
+        removeCookie('accesstoken', { path: '/' });
         removeCookie('jwt', { path: '/' });
       }
     } catch (error) {

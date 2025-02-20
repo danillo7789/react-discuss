@@ -101,8 +101,8 @@ const ActivityFeed = ({
             ></button>
           </div>
         )}
-        <div className='bg-elements border border-0 rounded-3'>
-          <div className='heading d-flex justify-content-between px-4 pt-2'>
+        <div className='border border-0 rounded-3'>
+          <div className='heading d-flex justify-content-between px-4 pt-2 sticky-top'>
             <div className='d-flex'>
               <div className='back-link'>
                 <BackLink
@@ -110,7 +110,7 @@ const ActivityFeed = ({
                   setVisibleActivity={setVisibleActivity}
                 />
               </div>
-              <div className='ms-5 f-sm'>RECENT ACTIVITIES</div>
+              <div className='ms-5 f-sm'>RECENT ACTIVITIES</div>              
             </div>
             <div></div>
           </div>
@@ -149,7 +149,7 @@ const ActivityFeed = ({
                 ? filteredActivities?.map((activity) => (
                     <div
                       key={activity?._id}
-                      className='border border-secondary rounded mb-2'
+                      className='bg-elements rounded mb-3 py-1'
                     >
                       <div className='d-flex p-1'>
                         <img
@@ -172,16 +172,16 @@ const ActivityFeed = ({
                             {moment(activity?.createdAt).fromNow()}
                           </small>
                           <div>
-                            <small className='f-sm'>posted to room</small>"
+                            <small className='f-sm'>posted to </small>"
                             <div>
                               <Link
                                 to={`/room/${activity?.room?._id}`}
                                 className='linkc dim'
                               >
-                                {activity?.room?.name}
+                                "{activity?.room?.name}"
                               </Link>
                             </div>
-                            "
+                            
                           </div>
                         </div>
                       </div>

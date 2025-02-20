@@ -32,8 +32,7 @@ const Login = () => {
       if (response.ok) {
         const token = data.token;
 
-        login(token);
-        setCookie('token', token, { path: '/', maxAge: 900 });
+        login(token);        
         setIsLoading(false);
         setAccess('');
         setPassword('');

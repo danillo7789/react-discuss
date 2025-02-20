@@ -90,8 +90,12 @@ body {
   color: rgb(131, 129, 194);
 }
 
-.dark {
-  color: rgb(14, 14, 29);
+.white {
+  color: rgb(239, 239, 242);
+}
+
+.white:hover {
+  color: rgb(167, 167, 197);
 }
 
 .bg-box {
@@ -103,6 +107,10 @@ body {
 }
 
 .bg-element-light {
+  background-color: rgb(48, 48, 75);
+}
+
+.bg-element-light:focus {
   background-color: rgb(48, 48, 75);
 }
 
@@ -307,6 +315,10 @@ body {
 
 .chat-mssg {
   max-width: 70%;
+}
+
+.sent-chat-bg {
+  background-color: rgb(8, 53, 105);
 }
 
 
