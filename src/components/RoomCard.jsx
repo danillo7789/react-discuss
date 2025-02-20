@@ -1,9 +1,11 @@
 import moment from 'moment';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../authContext/context';
 
 const RoomCard = ({ room }) => {
   const blank_img = import.meta.env.VITE_BLANK_IMG;
+  const { onlineUsers } = useAuth()
   // console.log('room card rendered');
 
   return (
@@ -16,7 +18,17 @@ const RoomCard = ({ room }) => {
             alt='display picture'
           />
           <Link className='linkc' to={`/profile/${room?.host?._id}`}>
-            <small className='dim pt-2'>@{room?.host?.username}</small>
+            <small className='dim pt-2'>
+              @{room?.host?.username}
+              {onlineUsers.has(room?.host?._id) && (
+                <img 
+                  width="10" height="10" 
+                  src="https://img.icons8.com/forma-light-filled/14/40C057/circled.png" 
+                  alt="online"
+                  style={{ marginLeft: "3px" }}
+                />
+              )}
+            </small>
           </Link>
         </div>
         <div className='pt-2'>{moment(room?.createdAt).fromNow()}</div>

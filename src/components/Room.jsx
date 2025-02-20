@@ -17,7 +17,7 @@ const Room = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
-  const { isLoggedIn, currentUser, fetchWithTokenRefresh, logout } = useAuth();
+  const { isLoggedIn, currentUser, fetchWithTokenRefresh, logout, onlineUsers } = useAuth();
   const [message, setMessage] = useState('');
   const [chatPosted, setChatPosted] = useState(false);
   const [chatDeleted, setChatDeleted] = useState(false);
@@ -469,7 +469,17 @@ const Room = () => {
                           alt='display picture'
                         />
                         <Link className='linkc' to={`/profile/${user?._id}`}>
-                          <small className='dim mt-2'>@{user?.username}</small>
+                          <small className='dim mt-2'>
+                            @{user?.username}
+                            {onlineUsers.has(user?._id) && (
+                              <img 
+                                  width="10" height="10" 
+                                  src="https://img.icons8.com/forma-light-filled/14/40C057/circled.png" 
+                                  alt="online"
+                                  style={{ marginLeft: "3px" }}
+                              />
+                            )}
+                            </small>
                         </Link>
                       </div>
                     ))}
@@ -495,7 +505,17 @@ const Room = () => {
                       alt='display picture'
                     />
                     <Link className='linkc' to={`/profile/${user?._id}`}>
-                      <small className='dim mt-2'>@{user?.username}</small>
+                      <small className='dim mt-2'>
+                        @{user?.username}
+                        {onlineUsers.has(user?._id) && (
+                          <img 
+                              width="10" height="10" 
+                              src="https://img.icons8.com/forma-light-filled/14/40C057/circled.png" 
+                              alt="online"
+                              style={{ marginLeft: "3px" }}
+                          />
+                        )}
+                      </small>
                     </Link>
                   </div>
                 ))}

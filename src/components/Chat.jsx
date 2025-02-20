@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
 const Chat = ({ chat, deleteChat, isLoading }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, onlineUsers } = useAuth();
   const blank_img = import.meta.env.VITE_BLANK_IMG;
   // console.log('chats rendered');
 
@@ -24,7 +24,17 @@ const Chat = ({ chat, deleteChat, isLoading }) => {
             <div className='d-flex f-sm '>
               {/* <img className="rounded-circle me-2 display-pic" src={chat?.sender?.profilePicture?.url || blank_img} alt="pic" /> */}
               <Link className='linkc' to={`/profile/${chat?.sender?._id}`}>
-                <small className='dim me-2'>@{chat?.sender?.username}</small>
+                <small className='dim me-2'>
+                  @{chat?.sender?.username}
+                  {onlineUsers.has(chat?.sender?._id) && (
+                    <img 
+                        width="10" height="10" 
+                        src="https://img.icons8.com/forma-light-filled/14/40C057/circled.png" 
+                        alt="online"
+                        style={{ marginLeft: "3px" }}
+                    />
+                  )}
+                </small>
               </Link>
               <span className='f-sm'>{moment(chat?.createdAt).fromNow()}</span>
             </div>

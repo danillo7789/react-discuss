@@ -26,7 +26,7 @@ const ActivityFeed = ({
 }) => {
   const [activities, setActivities] = useState([]);
   const blank_img = import.meta.env.VITE_BLANK_IMG;
-  const { searchQuery, topicFilter, fetchWithTokenRefresh, isLoggedIn } =
+  const { searchQuery, topicFilter, fetchWithTokenRefresh, isLoggedIn, onlineUsers } =
     useAuth();
   const prevActivitesLengthRef = useRef(activities.length);
 
@@ -102,7 +102,7 @@ const ActivityFeed = ({
           </div>
         )}
         <div className='border border-0 rounded-3'>
-          <div className='heading d-flex justify-content-between px-4 pt-2 sticky-top'>
+          <div className='heading d-flex justify-content-between px-4 pt-2'>
             <div className='d-flex'>
               <div className='back-link'>
                 <BackLink
@@ -110,7 +110,7 @@ const ActivityFeed = ({
                   setVisibleActivity={setVisibleActivity}
                 />
               </div>
-              <div className='ms-5 f-sm'>RECENT ACTIVITIES</div>              
+              <div className='ms-5 f-sm'>RECENT ACTIVITIES</div>
             </div>
             <div></div>
           </div>
@@ -166,6 +166,14 @@ const ActivityFeed = ({
                           >
                             <small className='dim me-2 f-sm'>
                               @{activity?.sender?.username}
+                              {onlineUsers.has(activity?.sender?._id) && (
+                                <img 
+                                    width="10" height="10" 
+                                    src="https://img.icons8.com/forma-light-filled/14/40C057/circled.png" 
+                                    alt="online"
+                                    style={{ marginLeft: "3px" }}
+                                />
+                              )}
                             </small>
                           </Link>
                           <small className='fw-lighter f-xsm'>

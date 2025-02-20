@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { decodeToken } from '../utils/decodeToken'; 
 import { baseUrl } from '../config/BaseUrl';
 import { useCookies } from 'react-cookie';
+import { io } from "socket.io-client";
 
 // Create the context
 const AuthContext = createContext(undefined);
@@ -12,9 +13,9 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [topicFilter, setTopicFilter] = useState('');
-  // const [token, setToken] = useState('');
+  const [topicFilter, setTopicFilter] = useState('');  
   const [cookies, setCookie, removeCookie] = useCookies(['accesstoken', 'jwt']);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   const fetchWithTokenRefresh = async (url, options = {}) => {
     try {
@@ -66,7 +67,6 @@ export const AuthProvider = ({ children }) => {
   };
   
 
-
   const fetchTokenFromCookies = async () => {
     try {
       const storedToken = cookies.token;
@@ -106,9 +106,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
   useEffect(() => {
     fetchTokenFromCookies();
   }, []);
+
+
+  const socket = io(baseUrl, {
+    reconnection: true,
+    reconnectionAttempts: 5, // Increased attempts
+    reconnectionDelay: 2000, // Delay before retrying
+    transports: ["websocket"],
+  });
+
+useEffect(() => {
+    if (currentUser) {
+      socket.emit("userOnline", currentUser.id);
+
+      socket.on("onlineUsers", (users) => {
+        setOnlineUsers(new Set([...users])); // Spread into an array
+      });
+
+      socket.on("reconnect_attempt", (attempt) => {
+        console.log(`Reconnect attempt ${attempt}`);
+      });
+
+      socket.on("reconnect", () => {
+        console.log("Reconnected successfully!");
+        socket.emit("userOnline", currentUser.id);
+      });
+
+      return () => {
+        if (currentUser) {
+          socket.emit("userOffline", currentUser.id);
+        }
+        socket.disconnect();
+      };
+    }
+}, [currentUser]);
 
   const login = (token) => {
     const decoded = decodeToken(token);
@@ -151,7 +186,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn,
       fetchWithTokenRefresh,
       setCookie,
-      cookies
+      cookies,
+      onlineUsers
     }}>
       {children}
     </AuthContext.Provider>
