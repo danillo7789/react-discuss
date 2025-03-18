@@ -6,7 +6,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './authContext/context.jsx';
 import ErrorPage from './components/ErrorPage.jsx'
-import Login from './components/Login.jsx'
+import Login from './components/Login.jsx';
+import ForgotPassword from './components/ForgotPassword.jsx';
 import Register from './components/Register.jsx';
 import AlertPage from './components/AlertPage.jsx';
 import UnLogged from './components/UnLogged.jsx';
@@ -17,7 +18,8 @@ import Profile from './components/Profile.jsx';
 import EditProfile from './components/EditProfile.jsx';
 import BrowseTopics from './components/BrowseTopics.jsx';
 import ActivityFeed from './components/ActivityFeed.jsx';
-import RoomFeed from './components/RoomFeed.jsx';
+import ResetPassword from './components/ResetPassword.jsx';
+// import RoomFeed from './components/RoomFeed.jsx';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,16 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "forgot-password",
+    element: <ForgotPassword />,
+    errorElement: <ErrorPage />
+  },
+  {
+    path: "reset-password",
+    element: <ResetPassword />,
     errorElement: <ErrorPage />
   },
   {
@@ -80,11 +92,6 @@ const router = createBrowserRouter([
     element: <ActivityFeed />,
     errorElement: <ErrorPage />
   },
-  // {
-  //   path: "roomfeed",
-  //   element: <RoomFeed />,
-  //   errorElement: <ErrorPage />
-  // },
 ]);
 
 // Create a QueryClient instance

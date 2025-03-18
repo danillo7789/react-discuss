@@ -11,7 +11,16 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { isLoggedIn, login, setCookie } = useAuth();
+  const { isLoggedIn, login } = useAuth();
+
+  const handleGoogleLogin = () => {
+    try {
+      window.location.href = `${baseUrl}/auth/google`;
+    } catch (error) {
+      setError(error);
+      console.error('Error logging in with Google:', error);
+    }
+  }
 
   const handleSubmit = async (e) => {
     setIsLoading(true);
@@ -84,8 +93,7 @@ const Login = () => {
                   placeholder='Email or Username'
                   value={access}
                   className='form-control mb-3 bg-input-txt border border-0'
-                  onChange={(e) => setAccess(e.target.value)}
-                  required
+                  onChange={(e) => setAccess(e.target.value)}                  
                 />
               </div>
               <div>
@@ -95,18 +103,28 @@ const Login = () => {
                   placeholder='Password'
                   value={password}
                   className='form-control mb-3 bg-input-txt border border-0'
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onChange={(e) => setPassword(e.target.value)}                  
                 />
               </div>
-              <button className='btn btns' type='submit' disabled={isLoading}>
+              <button style={{width: '290px'}} className='btn btns' type='submit' disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </button>
             </form>
+            <div>
+              <button style={{width: '290px'}} className='btn btn-light mb-3' disabled={isLoading} onClick={handleGoogleLogin}>
+                {isLoading ? 'Logging in with Google...' : <>Login with <img src='/google-icon.png' width={22} height={22} alt='Google' /> </>}                  
+              </button>
+            </div>
             <p className='d-flex'>
               Don't have an account?{' '}
               <Link className='nav-link nav-text px-2 text-info' to='/register'>
                 Register
+              </Link>
+            </p>
+            <p className='d-flex'>
+              Forgot Password?
+              <Link className='nav-link nav-text px-2 text-info' to='/forgot-password'>
+                Click here
               </Link>
             </p>
           </div>

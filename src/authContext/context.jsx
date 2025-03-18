@@ -163,8 +163,6 @@ useEffect(() => {
       if (response.ok) {
         setCurrentUser(null);
         setIsLoggedIn(false);
-        removeCookie('accesstoken', { path: '/' });
-        removeCookie('jwt', { path: '/' });
       }
     } catch (error) {
       console.error('Error logging out:', error);
