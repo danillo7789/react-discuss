@@ -9,15 +9,19 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSocialLoading, setIsSocialLoading] = useState(false);
 
   const navigate = useNavigate();
   const { isLoggedIn, login } = useAuth();
 
   const handleGoogleLogin = () => {
+    setIsSocialLoading(true)
     try {
       window.location.href = `${baseUrl}/auth/google`;
+      setIsSocialLoading(false);
     } catch (error) {
       setError(error);
+      setIsSocialLoading(false)
       console.error('Error logging in with Google:', error);
     }
   }
@@ -112,7 +116,7 @@ const Login = () => {
             </form>
             <div>
               <button style={{width: '290px'}} className='btn btn-light mb-3' disabled={isLoading} onClick={handleGoogleLogin}>
-                {isLoading ? 'Logging in with Google...' : <>Login with <img src='/google-icon.png' width={22} height={22} alt='Google' /> </>}                  
+                {isSocialLoading ? 'Logging in with Google...' : <>Login with <img src='/google-icon.png' width={22} height={22} alt='Google' /> </>}                  
               </button>
             </div>
             <p className='d-flex'>
