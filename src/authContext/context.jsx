@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
     transports: ["websocket"],
   });
 
-useEffect(() => {
+  useEffect(() => {
     if (currentUser) {
       socket.emit("userOnline", currentUser.id);
 
@@ -143,7 +143,7 @@ useEffect(() => {
         socket.disconnect();
       };
     }
-}, [currentUser]);
+  }, [currentUser]);
 
   const login = (token) => {
     const decoded = decodeToken(token);
