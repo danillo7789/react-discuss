@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { decodeToken } from '../utils/decodeToken'; 
 import { baseUrl } from '../config/BaseUrl';
-import { useCookies } from 'react-cookie';
 import { io } from "socket.io-client";
 
 // Create the context
@@ -14,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState('');  
-  const [cookies, setCookie, removeCookie] = useCookies(['accesstoken', 'jwt']);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
 
   const fetchWithTokenRefresh = async (url, options = {}) => {
@@ -69,35 +67,24 @@ export const AuthProvider = ({ children }) => {
 
   const fetchTokenFromCookies = async () => {
     try {
-      const storedToken = cookies.token;
-      if (storedToken) {
-        const decoded = decodeToken(storedToken);
+      const response = await fetch(`${baseUrl}/api/user/refresh`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {            
+        const decoded = decodeToken(data.token);
         if (decoded) {
           setCurrentUser(decoded.user);
-          setIsLoggedIn(true);          
+          setIsLoggedIn(true);              
         }
       } else {
-        
-          const response = await fetch(`${baseUrl}/api/user/refresh`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {            
-            const decoded = decodeToken(data.token);
-            if (decoded) {
-              setCurrentUser(decoded.user);
-              setIsLoggedIn(true);              
-            }
-          } else {
-            console.error('Error fetching token from cookies:', data.message);
-          }
-        
+        console.error('Error fetching token from cookies:', data.message);
       }
     } catch (error) {
       console.error('Error fetching token from cookies:', error);
@@ -169,8 +156,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  return (
-    <AuthContext.Provider value={{
+  const contextValue = {
       currentUser,
       isLoggedIn,
       isLoading,
@@ -183,10 +169,11 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser,
       setIsLoggedIn,
       fetchWithTokenRefresh,
-      setCookie,
-      cookies,
       onlineUsers
-    }}>
+    }
+
+  return (
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

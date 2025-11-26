@@ -38,7 +38,7 @@ const TopicFeed = () => {
     queryFn: () => fetchTopics(fetchWithTokenRefresh), // Query function
     enabled: isLoggedIn, // Options
     retry: 1,
-    staleTime: 1000 * 60 * 60 * 6,
+    staleTime: 1000 * 60 * 60 * 1,
     onError: (err) => {
       if (err.message === 'Token expired, please login') {
         logout();

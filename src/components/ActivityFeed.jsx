@@ -4,10 +4,11 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../authContext/context';
 import BackLink from './BackLink';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
-const getAllChats = async (fetchWithTokenRefresh) => {
-  const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats`, {
+
+const getAllChats = async ({pageParam = 1, fetchWithTokenRefresh}) => {
+  const response = await fetchWithTokenRefresh(`${baseUrl}/api/get/chats?page=${pageParam}&limit=10`, {
     method: 'GET',
   });
 
@@ -24,17 +25,23 @@ const ActivityFeed = ({
   setVisibleActivity,
   filterActivity,
 }) => {
+  const [page, setPage] = useState(1);
+  const [chats, setChats] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const loaderRef = useRef(null);
+
   const [activities, setActivities] = useState([]);
   const blank_img = import.meta.env.VITE_BLANK_IMG;
   const { searchQuery, topicFilter, fetchWithTokenRefresh, isLoggedIn, onlineUsers } =
     useAuth();
   const prevActivitesLengthRef = useRef(activities.length);
 
-  const { data, error, isLoading, refetch } = useQuery({
+  const { data, error, isLoading, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['activites-chats'],
-    queryFn: () => getAllChats(fetchWithTokenRefresh),
+    queryFn: ({ pageParam = 1 }) => getAllChats({pageParam, fetchWithTokenRefresh}),
+     getNextPageParam: (lastPage) => lastPage.hasMore ? lastPage.page + 1 : undefined,
     enabled: isLoggedIn,
-    staleTime: 1000 * 60 * 60 * 6,
+    staleTime: 1000 * 60 * 60 * 1,
     retry: 1,
     onError: (err) => {
       if (err.message === 'Token expired, please login') {
@@ -48,16 +55,41 @@ const ActivityFeed = ({
 
   useEffect(() => {
     if (data) {
-      setActivities(data);
+      const merged = data.pages.flatMap((page) => page.chats);
+      setActivities(merged);
     }
   }, [data]);
 
+  // useEffect(() => {
+  //   if (activities.length !== prevActivitesLengthRef.current) {
+  //     refetch();
+  //     prevActivitesLengthRef.current = activities.length;
+  //   }
+  // }, [activities]);
+
+  // reset infinite scroll when search/filter changes
+  const queryClient = useQueryClient();
   useEffect(() => {
-    if (activities.length !== prevActivitesLengthRef.current) {
-      refetch();
-      prevActivitesLengthRef.current = activities.length;
+    queryClient.invalidateQueries(['activites-chats']);
+  }, [searchQuery, topicFilter]);
+
+  //infinite scroll observer
+  const loadMoreRef = useRef(null);
+  useEffect(() => {
+    if (!hasNextPage) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchNextPage();
+      }
+    });
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
     }
-  }, [activities]);
+
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
 
   // const filteredActivities = filterFunc ? activities.filter(filterFunc) : activities;
 
@@ -200,6 +232,10 @@ const ActivityFeed = ({
                     </div>
                   ))
                 : 'No activities to Show'}
+
+              <div ref={loadMoreRef} style={{ height: '5px' }} />
+
+              {isFetchingNextPage && <p>Loading more...</p>}
             </div>
           )}
         </div>
